@@ -1,8 +1,7 @@
 ---
 tags:
   - component
-updated:
-  - 2023-10-13
+updated: 2023-10-15
 ---
 
 > [!attention] Requires [Transform](/Components/Transform)

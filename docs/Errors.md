@@ -1,3 +1,7 @@
+---
+updated: 2023-10-15
+---
+
 # List of Errors
 * `INVALID_HEX_STRING` - When an invalid hex string is passed
 * `MISSING_REQUIRED_COMPONENT` - When a component requires another component but it is not present.
