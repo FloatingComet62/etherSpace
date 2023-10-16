@@ -23,7 +23,7 @@ Color(std::string hex_string)
 ```
 
 # Methods
-Convert to string
+Convert to hex string
 ```cpp
-std::string to_string()
+std::string toString()
 ```
