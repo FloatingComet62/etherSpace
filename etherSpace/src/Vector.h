@@ -19,6 +19,7 @@ public:
 
 	v3(float i = 0, float j = 0, float k = 0);
 	v3(v2 vec);
+	std::string toString();
 };
 
 float dot(v3 vec1, v3 vec2);

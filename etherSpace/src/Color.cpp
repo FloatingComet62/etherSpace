@@ -68,10 +68,8 @@ Color::Color(std::string hex_string) {
 
     if (parsed_string.length() != 8) {
         // some weird invalid hex was provided
-        std::string errorMessage = hex_string;
-        errorMessage += " is not a valid hex string\n";
         ErrorManager::getInstance()->sendError(eErrorType_t::INVALID_HEX_STRING,
-            errorMessage);
+            hex_string + "is not a valid hex string\n");
         this->red = 0;
         this->green = 0;
         this->blue = 0;
@@ -86,19 +84,16 @@ Color::Color(std::string hex_string) {
 }
 
 std::array<uint8_t, 4> Color::toRGBA() {
-    std::array<uint8_t, 4> t = {this->red, this->green, this->blue, this->alpha};
-    return t;
+    return std::array<uint8_t, 4> {this->red, this->green, this->blue, this->alpha};
 }
 std::array<uint8_t, 4> Color::toBGRA() {
-    std::array<uint8_t, 4> t = {this->blue, this->green, this->red, this->alpha};
-    return t;
+    return std::array<uint8_t, 4> {this->blue, this->green, this->red, this->alpha};
 }
 
 std::string Color::toString() {
-    std::string hex_string = "#";
-    hex_string += valueToHexStr(this->red);
-    hex_string += valueToHexStr(this->green);
-    hex_string += valueToHexStr(this->blue);
-    hex_string += valueToHexStr(this->alpha);
-    return hex_string;
+    return "#"
+        + valueToHexStr(this->red)
+        + valueToHexStr(this->green)
+        + valueToHexStr(this->blue)
+        + valueToHexStr(this->alpha);
 }
