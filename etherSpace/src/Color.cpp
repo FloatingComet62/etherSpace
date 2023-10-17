@@ -70,7 +70,7 @@ Color::Color(std::string hex_string) {
         // some weird invalid hex was provided
         std::string errorMessage = hex_string;
         errorMessage += " is not a valid hex string\n";
-        Errors::getInstance()->sendError(eErrorType_t::INVALID_HEX_STRING,
+        ErrorManager::getInstance()->sendError(eErrorType_t::INVALID_HEX_STRING,
             errorMessage);
         this->red = 0;
         this->green = 0;
@@ -85,9 +85,16 @@ Color::Color(std::string hex_string) {
     this->alpha = hexStrToValue(parsed_string.substr(6, 2));
 }
 
+std::array<uint8_t, 4> Color::toRGBA() {
+    std::array<uint8_t, 4> t = {this->red, this->green, this->blue, this->alpha};
+    return t;
+}
+std::array<uint8_t, 4> Color::toBGRA() {
+    std::array<uint8_t, 4> t = {this->blue, this->green, this->red, this->alpha};
+    return t;
+}
+
 std::string Color::toString() {
-    // std::stringstream string{};
-    // string << std::hex << this->red;
     std::string hex_string = "#";
     hex_string += valueToHexStr(this->red);
     hex_string += valueToHexStr(this->green);

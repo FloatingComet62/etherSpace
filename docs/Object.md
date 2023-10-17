@@ -2,7 +2,6 @@
 updated: 2023-10-13
 ---
 
-
 # Properties
 * *std::vector\<[Component](Components/README)\>* `components` - The list of components which the object has
 

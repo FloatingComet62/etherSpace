@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <array>
 #include <cstdint>
 
 class Color {
@@ -12,5 +13,7 @@ public:
 
 	Color(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 0);
 	Color(std::string hex_string);
+	std::array<uint8_t, 4> toRGBA();
+	std::array<uint8_t, 4> toBGRA();
 	std::string toString();
 };

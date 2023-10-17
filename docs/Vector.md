@@ -27,7 +27,7 @@ v2(float i = 0, float j = 0)
 ## Methods
 Convert to string
 ```cpp
-std::string to_string()
+std::string toString()
 ```
 
 # Vector3
@@ -44,11 +44,11 @@ v3(float i = 0, float j = 0, float k = 0)
 
 Initialize the 3D vector with 2D vector
 ```cpp
-v3(v2 vec2)
+v3(v2 vec)
 ```
 
 ## Methods
 Convert to string
 ```cpp
-std::string to_string()
+std::string toString()
 ```

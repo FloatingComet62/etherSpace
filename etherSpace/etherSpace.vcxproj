@@ -130,10 +130,12 @@
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\Errors.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Color.h" />
     <ClInclude Include="src\Errors.h" />
+    <ClInclude Include="src\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

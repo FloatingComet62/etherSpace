@@ -22,7 +22,7 @@ Render(Object& object, Shape shape, Color color)
 
 ## Inherited
 Called once at the start of the program ^MissingRequiredComponent
-> [!danger] Exception: [MISSING_REQUIRED_COMPONENT](/Errors##Missing%20Required%20Component)
+> [!danger] Exception: [MISSING_REQUIRED_COMPONENT](ErrorManager.md##Missing%20Required%20Component)
 ```cpp
 void start()
 ```

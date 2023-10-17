@@ -1,23 +1,55 @@
 #include "Errors.h"
 
-Errors::Errors() {
+std::string errorTypeToString(eErrorType_t error_type) {
+	switch (error_type) {
+	case eErrorType_t::NONE:
+		return "None";
+	case eErrorType_t::TEST:
+		return "Test";
+	case eErrorType_t::INVALID_HEX_STRING:
+		return "Invalid Hex String";
+	case eErrorType_t::MISSING_REQUIRED_COMPONENT:
+		return "Missing Required Component";
+	default:
+		return "Unknown";
+	}
+}
+
+ErrorManager::ErrorManager() {
 	this->error_type = eErrorType_t::NONE;
+	this->error_message = "";
 	this->ignore_consecutive_errors_with_same_code = true;
 }
 
-Errors* Errors::getInstance() {
-	if (instance_ptr == nullptr) {
-		instance_ptr = new Errors();
-	}
-	return instance_ptr;
+ErrorManager* ErrorManager::getInstance() {
+	static ErrorManager instance_ptr;
+	return &instance_ptr;
 }
-void Errors::sendError(eErrorType_t error_type, std::string error_message) {
+
+bool ErrorManager::hasError() {
+	return this->error_type != eErrorType_t::NONE;
+}
+
+void ErrorManager::sendError(eErrorType_t error_type, std::string error_message) {
+	if (this->ignore_consecutive_errors_with_same_code && this->error_type == error_type) {
+		return;
+	}
 	this->error_message = error_message;
 	this->error_type = error_type;
+
+	std::cout << "Error Code: " << errorTypeToString(error_type)
+		<< "\nError Received: " << error_message << std::endl;
 }
-std::pair<eErrorType_t, std::string> Errors::getError() {
+
+void ErrorManager::clearError() {
+	this->error_type = eErrorType_t::NONE;
+	this->error_message = "";
+}
+
+std::pair<eErrorType_t, std::string> ErrorManager::getError() {
 	return std::make_pair(this->error_type, this->error_message);
 }
-void Errors::ignoreConsecutiveErrorsWithSameCode(bool value) {
+
+void ErrorManager::ignoreConsecutiveErrorsWithSameCode(bool value) {
 	this->ignore_consecutive_errors_with_same_code = value;
 }

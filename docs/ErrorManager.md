@@ -18,9 +18,19 @@ updated: 2023-10-15
 `Error` is singleton class which manages error handling in etherSpace
 
 ## Methods
+Does the Error Manager contain an error
+```cpp
+bool hasError()
+```
+
+Clear the error in the Error Manager
+```cpp
+void clearError()
+```
+
 Get the singleton instance of Error
 ```cpp
-Errors* getInstance();
+Errors* getInstance()
 ```
 
 Send an error to the Error system
