@@ -1,4 +1,4 @@
-#include "Errors.h"
+#include "ErrorManager.h"
 
 std::string errorTypeToString(eErrorType_t error_type) {
 	switch (error_type) {

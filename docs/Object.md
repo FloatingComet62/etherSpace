@@ -1,5 +1,5 @@
 ---
-updated: 2023-10-13
+updated: 2023-10-18
 ---
 
 # Properties
@@ -34,7 +34,7 @@ void addComponents(std::vector<Component> component)
 
 Get a component
 ```cpp
-std::optional<Component> getComponent()
+std::optional<Component> getComponent(std::string componentName)
 ```
 
 Called once at the start of the program

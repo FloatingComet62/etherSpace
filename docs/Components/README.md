@@ -1,8 +1,7 @@
 ---
 tags:
   - component
-updated:
-  - 2023-10-13
+updated: 2023-10-18
 ---
 
 Components provide a way to introduce functionality to objects and interactions they face.
@@ -15,6 +14,7 @@ Create a Component with an object
 ```cpp
 Component(Object& object)
 ```
+
 # Methods
 Called once at the start of the program
 ```cpp
@@ -28,7 +28,7 @@ void update()
 
 Convert to string
 ```cpp
-std::string to_string()
+std::string toString()
 ```
 
 # Inbuilt components

@@ -76,6 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,13 +129,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Color.cpp" />
-    <ClCompile Include="src\Errors.cpp" />
+    <ClCompile Include="src\Component.cpp" />
+    <ClCompile Include="src\ErrorManager.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\Optional.cpp" />
     <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Color.h" />
-    <ClInclude Include="src\Errors.h" />
+    <ClInclude Include="src\Component.h" />
+    <ClInclude Include="src\ErrorManager.h" />
+    <ClInclude Include="src\Object.h" />
+    <ClInclude Include="src\Optional.h" />
+    <ClInclude Include="src\Shape.h" />
     <ClInclude Include="src\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,12 +1,11 @@
 ---
 tags:
   - component
-updated: 2023-10-15
+updated: 2023-10-18
 ---
 
-> [!attention] Requires [Transform](/Components/Transform)
 # Properties
-* *[README](Shape/README.md)* `shape` - Shape of the object
+* *[Shape](Shape/README.md)* `shape` - Shape of the object
 * *[Color](Color.md)* `color` - Color of the object
 
 ## Inherited
@@ -34,5 +33,5 @@ void update()
 
 Convert to string
 ```cpp
-std::string to_string()
+std::string toString()
 ```

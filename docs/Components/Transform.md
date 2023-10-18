@@ -33,5 +33,5 @@ void update()
 
 Convert to string
 ```cpp
-std::string to_string()
+std::string toString()
 ```
