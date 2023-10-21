@@ -1,22 +1,26 @@
 #include "Component.h"
 
-Components::Component::Component(Object& object) : object(object) {}
-void Components::Component::start() {}
-void Components::Component::update() {}
-std::string Components::Component::toString() {
+using namespace Components;
+
+Component::Component(Object& object) : object(object) {}
+void Component::start() {}
+void Component::update() {}
+std::string Component::toString() {
 	return "None";
 }
 
-Components::Transform::Transform(Object& object, v2 position, v2 rotation) : Component(object) {
+Transform::Transform(Object& object, v2 position, v2 rotation) : Component(object) {
 	this->position = position;
 	this->rotation = rotation;
 }
-void Components::Transform::start() {}
-void Components::Transform::update() {}
-std::string Components::Transform::toString() {
+void Transform::start() {}
+void Transform::update() {}
+std::string Transform::toString() {
 	return "Transform";
 }
 
-Components::Renderer::Renderer(Object& object, Shapes::Shape shape, Color color) : Component(object) {
+Renderer::Renderer(Object& object, Shapes::Shape shape, Color color)
+	: Component(object),
+		shape(shape) {
 	this->color = color;
 }

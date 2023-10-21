@@ -4,13 +4,12 @@
 
 template <class T>
 class Optional {
-private:
 	bool has_value;
-	T data;
+	T* data;
+
 public:
-	Optional();
-	Optional(T data);
+	Optional(T* data = nullptr);
 	bool hasValue();
-	T getData();
+	T* getData();
 	std::string toString();
 };

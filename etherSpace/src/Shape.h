@@ -1,6 +1,12 @@
 #pragma once
 
-#include "Component.h"
+#include <stdint.h>
+
+namespace Components {
+	class Component;
+	class Transform;
+	class Renderer;
+};
 
 namespace Shapes {
 	class Config {
@@ -15,19 +21,20 @@ namespace Shapes {
 		static Config* getConfig();
 		void setCenterMode(bool value);
 	};
+
 	class Shape {
-		// Components::Transform& transform;
+		Components::Transform& transform;
 		uint8_t*& pixels;
 	public:
-		Shape();
-		// Shape(Components::Transform& transform, uint8_t*& pixels);
+		Shape(Components::Transform& transform, uint8_t*& pixels);
 		virtual void draw();
 	};
+
 	class Rectangle : Shape {
 	public:
 		float width;
 		float height;
 
-		// Rectangle(float width, float height, Components::Transform& transform, uint8_t*& pixels);
+		Rectangle(float width, float height, Components::Transform& transform, uint8_t*& pixels);
 	};
 }

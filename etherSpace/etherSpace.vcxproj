@@ -134,6 +134,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Optional.cpp" />
+    <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>

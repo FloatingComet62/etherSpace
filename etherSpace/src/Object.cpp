@@ -16,9 +16,11 @@ void Object::addComponents(std::vector<Components::Component> components) {
 		this->components.push_back(component);
 	}
 }
+/*
 Optional<Components::Component> Object::getComponent(std::string compoonentName) {
 	for (auto& component : this->components)
 		if (component.toString() == compoonentName)
-			return Optional<Components::Component>(component);
+			return Optional<Components::Component>(&component);
 	return Optional<Components::Component>();
 }
+*/

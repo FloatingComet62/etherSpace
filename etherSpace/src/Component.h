@@ -19,6 +19,7 @@ namespace Components {
 		virtual void update();
 		virtual std::string toString();
 	};
+
 	class Transform : public Component {
 	public:
 		v2 position;
@@ -29,6 +30,7 @@ namespace Components {
 		void update();
 		std::string toString();
 	};
+
 	class Renderer : public Component {
 		Shapes::Shape shape;
 		Color color;
