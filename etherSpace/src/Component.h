@@ -11,7 +11,7 @@ namespace Components {
 	bool is_null; // used for invalid component
 		
 	public:
-		Component();
+		Component(bool is_null);
 		virtual void start();
 		virtual void update();
 		virtual std::string toString();

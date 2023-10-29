@@ -24,5 +24,5 @@ std::pair<Components::Component, bool> Object::getComponent(std::string compoone
 	for (auto& component : this->components)
 		if (component.toString() == compoonentName)
 			return std::make_pair(component, true);
-	return std::make_pair(Components::Component{}, false);
+	return std::make_pair(Components::Component{ true }, false);
 }

@@ -2,8 +2,8 @@
 
 using namespace Components;
 
-Component::Component() {
-	this->is_null = true;
+Component::Component(bool is_null = true) {
+	this->is_null = is_null;
 }
 void Component::start() {}
 void Component::update() {}
@@ -11,7 +11,7 @@ std::string Component::toString() {
 	return "None";
 }
 
-Transform::Transform(v2 position, v2 rotation) : Component() {
+Transform::Transform(v2 position, v2 rotation) : Component(false) {
 	this->position = position;
 	this->rotation = rotation;
 }
@@ -22,6 +22,6 @@ std::string Transform::toString() {
 }
 
 Renderer::Renderer(Transform& transform, Shapes::Shape shape, Color color)
-	: shape(shape), transform(transform) {
+	: Component(false), shape(shape), transform(transform) {
 	this->color = color;
 }
