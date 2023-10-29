@@ -18,6 +18,7 @@ int main() {
 	object->addComponent(renderer);
 
 	auto res = object->getComponent("Renderer");
+	std::cout << object->components.size() << "\n";
 	std::cout << res.first.toString();
 	// TODO: learn how inheritance works and how to map .toString() to child classes instead of parent `Component` class
 };

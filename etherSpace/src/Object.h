@@ -6,9 +6,9 @@
 
 class Object {
 	bool is_null; // used for invalid object
-	std::vector<Components::Component> components;
 
 public:
+	std::vector<Components::Component> components;
 	Object();
 	Object(Components::Transform transform);
 	Object(Components::Transform transform, Components::Renderer renderer);
