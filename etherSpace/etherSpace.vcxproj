@@ -133,7 +133,6 @@
     <ClCompile Include="src\ErrorManager.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Object.cpp" />
-    <ClCompile Include="src\Optional.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
@@ -142,7 +141,6 @@
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ErrorManager.h" />
     <ClInclude Include="src\Object.h" />
-    <ClInclude Include="src\Optional.h" />
     <ClInclude Include="src\Shape.h" />
     <ClInclude Include="src\Vector.h" />
   </ItemGroup>

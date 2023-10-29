@@ -6,15 +6,12 @@
 #include "Shape.h"
 #include "Color.h"
 
-class Object;
-
 namespace Components {
 	class Component {
-	private:
-		Object& object;
+	bool is_null; // used for invalid component
 		
 	public:
-		Component(Object& object);
+		Component();
 		virtual void start();
 		virtual void update();
 		virtual std::string toString();
@@ -25,7 +22,7 @@ namespace Components {
 		v2 position;
 		v2 rotation;
 
-		Transform(Object& object, v2 position = v2(), v2 rotation = v2());
+		Transform(v2 position = v2(), v2 rotation = v2());
 		void start();
 		void update();
 		std::string toString();
@@ -34,7 +31,8 @@ namespace Components {
 	class Renderer : public Component {
 		Shapes::Shape shape;
 		Color color;
+		Transform& transform;
 
-		Renderer(Object& object, Shapes::Shape shape, Color color);
+		Renderer(Transform& transform, Shapes::Shape shape, Color color);
 	};
 };
