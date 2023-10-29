@@ -21,7 +21,10 @@ std::string Transform::toString() {
 	return "Transform";
 }
 
-Renderer::Renderer(Transform& transform, Shapes::Shape shape, Color color)
+Renderer::Renderer(Transform* transform, Shapes::Shape shape, Color color)
 	: Component(false), shape(shape), transform(transform) {
 	this->color = color;
+}
+std::string Renderer::toString() {
+	return "Renderer";
 }

@@ -23,18 +23,18 @@ namespace Shapes {
 	};
 
 	class Shape {
-		Components::Transform& transform;
-		uint8_t*& pixels;
+		Components::Transform* transform;
+		uint8_t* pixels;
 	public:
-		Shape(Components::Transform& transform, uint8_t*& pixels);
+		Shape(Components::Transform* transform, uint8_t* pixels);
 		virtual void draw();
 	};
 
-	class Rectangle : Shape {
+	class Rectangle : public Shape {
 	public:
 		float width;
 		float height;
 
-		Rectangle(float width, float height, Components::Transform& transform, uint8_t*& pixels);
+		Rectangle(float width, float height, Components::Transform* transform, uint8_t* pixels);
 	};
 }

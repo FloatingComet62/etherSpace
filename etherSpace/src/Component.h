@@ -31,8 +31,9 @@ namespace Components {
 	class Renderer : public Component {
 		Shapes::Shape shape;
 		Color color;
-		Transform& transform;
-
-		Renderer(Transform& transform, Shapes::Shape shape, Color color);
+		Transform* transform;
+	public:
+		Renderer(Transform* transform, Shapes::Shape shape, Color color);
+		std::string toString();
 	};
 };
