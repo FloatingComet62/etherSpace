@@ -25,6 +25,8 @@ Renderer::Renderer(Transform* transform, Shapes::Shape shape, Color color)
 	: Component(false), shape(shape), transform(transform) {
 	this->color = color;
 }
+void Renderer::start() {}
+void Renderer::update() {}
 std::string Renderer::toString() {
 	return "Renderer";
 }

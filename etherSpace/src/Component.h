@@ -23,8 +23,8 @@ namespace Components {
 		v2 rotation;
 
 		Transform(v2 position = v2(), v2 rotation = v2());
-		void start();
-		void update();
+		void start() override;
+		void update() override;
 		std::string toString();
 	};
 
@@ -34,6 +34,8 @@ namespace Components {
 		Transform* transform;
 	public:
 		Renderer(Transform* transform, Shapes::Shape shape, Color color);
+		void start() override;
+		void update() override;
 		std::string toString();
 	};
 };
