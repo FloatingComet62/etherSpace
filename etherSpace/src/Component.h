@@ -6,15 +6,24 @@
 #include "Shape.h"
 #include "Color.h"
 
+class Object;
+
 namespace Components {
+	typedef enum {
+		TRANSFORM,
+		RENDERER
+	} ComponentSignature;
+
+	std::string signatureToString(ComponentSignature componentSignature);
+	
 	class Component {
-	bool is_null; // used for invalid component
-		
+	protected:
+		Object* object;
 	public:
-		Component(bool is_null);
-		virtual void start();
-		virtual void update();
-		virtual std::string toString();
+		// Pure Virtual Functions - https://www.youtube.com/watch?v=UWAdd13EfM8
+		virtual void start() = 0;
+		virtual void update() = 0;
+		virtual ComponentSignature signature() = 0;
 	};
 
 	class Transform : public Component {
@@ -22,20 +31,20 @@ namespace Components {
 		v2 position;
 		v2 rotation;
 
-		Transform(v2 position = v2(), v2 rotation = v2());
+		Transform(Object* object, v2 position = v2(), v2 rotation = v2());
 		void start() override;
 		void update() override;
-		std::string toString();
+		ComponentSignature signature() override;
 	};
 
 	class Renderer : public Component {
+		Transform* transform;
 		Shapes::Shape shape;
 		Color color;
-		Transform* transform;
 	public:
-		Renderer(Transform* transform, Shapes::Shape shape, Color color);
+		Renderer(Object* object, Shapes::Shape shape, Color color);
 		void start() override;
 		void update() override;
-		std::string toString();
+		ComponentSignature signature() override;
 	};
 };

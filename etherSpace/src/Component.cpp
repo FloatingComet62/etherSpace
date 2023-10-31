@@ -1,32 +1,46 @@
 #include "Component.h"
 
+#include "Object.h"
+#include "ErrorManager.h"
+
 using namespace Components;
 
-Component::Component(bool is_null = true) {
-	this->is_null = is_null;
-}
-void Component::start() {}
-void Component::update() {}
-std::string Component::toString() {
-	return "None";
+std::string Components::signatureToString(ComponentSignature componentSignature) {
+	switch (componentSignature) {
+	case ComponentSignature::TRANSFORM:
+		return "Transform";
+	case ComponentSignature::RENDERER:
+		return "Renderer";
+	default:
+		return "None";
+	};
 }
 
-Transform::Transform(v2 position, v2 rotation) : Component(false) {
+Transform::Transform(Object* object, v2 position, v2 rotation) {
+	this->object = object;
 	this->position = position;
 	this->rotation = rotation;
 }
 void Transform::start() {}
 void Transform::update() {}
-std::string Transform::toString() {
-	return "Transform";
+ComponentSignature Transform::signature() {
+	return ComponentSignature::TRANSFORM;
 }
 
-Renderer::Renderer(Transform* transform, Shapes::Shape shape, Color color)
-	: Component(false), shape(shape), transform(transform) {
+Renderer::Renderer(Object* object, Shapes::Shape shape, Color color)
+	: shape(shape), transform(nullptr) {
+	this->object = object;
 	this->color = color;
 }
-void Renderer::start() {}
+void Renderer::start() {
+	auto res = this->object->getComponent(ComponentSignature::TRANSFORM);
+	if (!res.second) {
+		ErrorManager::getInstance()->sendError(eErrorType_t::MISSING_REQUIRED_COMPONENT, "Renderer requires Transform");
+		return;
+	}
+	this->transform = (Components::Transform*)res.first;
+}
 void Renderer::update() {}
-std::string Renderer::toString() {
-	return "Renderer";
+ComponentSignature Renderer::signature() {
+	return ComponentSignature::RENDERER;
 }

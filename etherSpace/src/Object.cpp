@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Object.h"
 
 Object::Object() {}
@@ -11,11 +9,11 @@ void Object::addComponents(std::vector<Components::Component*> components) {
 		this->components.push_back(component);
 	}
 }
-std::pair<Components::Component*, bool> Object::getComponent(std::string componentName) {
+std::pair<Components::Component*, bool> Object::getComponent(Components::ComponentSignature componentSignature) {
 	for (auto& component : this->components) {
-		if (component->toString() == componentName) {
+		if (component->signature() == componentSignature) {
 			return std::make_pair(component, true);
 		}
 	}
-	return std::make_pair(&Components::Component{ true }, false);
+	return std::make_pair(nullptr, false);
 }

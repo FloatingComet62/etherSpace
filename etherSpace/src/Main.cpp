@@ -8,16 +8,16 @@ int main() {
 
 	uint8_t* pixels = {};
 
-	auto transform = Components::Transform{ v2(10, 10) };
+	auto object = new Object();
+	auto transform = Components::Transform{ object, v2(10, 10) };
 	auto renderer = Components::Renderer{
-		&transform,
+		object,
 		Shapes::Rectangle{ 10.f, 10.f, &transform, pixels },
 		Color("#fff")
 	};
-	auto object = new Object();
 	object->addComponent(&transform);
 	object->addComponent(&renderer);
 
-	auto res = object->getComponent("Renderer");
-	std::cout << res.first->toString();
+	auto res = object->getComponent(Components::ComponentSignature::RENDERER);
+	std::cout << Components::signatureToString(res.first->signature());
 };
