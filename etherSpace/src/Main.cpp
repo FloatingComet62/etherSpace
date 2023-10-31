@@ -4,6 +4,10 @@
 #include "Component.h"
 
 int main() {
+	// TODO: update docs
+	// TODO: write tests
+	// TODO: implement a gui lib
+
 	std::cout << "Hello etherSpace" << std::endl;
 
 	uint8_t* pixels = {};
