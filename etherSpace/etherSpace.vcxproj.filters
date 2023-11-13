@@ -9,52 +9,63 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Exporter">
+      <UniqueIdentifier>{2692f487-cf69-4e97-be82-b0fef6c7db58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Main.cpp">
+    <ClCompile Include="src\etherSpace\ErrorManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ErrorManager.cpp">
+    <ClCompile Include="src\etherSpace\Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Color.cpp">
+    <ClCompile Include="src\etherSpace\Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Vector.cpp">
+    <ClCompile Include="src\etherSpace\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Object.cpp">
+    <ClCompile Include="src\etherSpace\Component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Component.cpp">
+    <ClCompile Include="src\etherSpace\Shape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shape.cpp">
+    <ClCompile Include="src\etherSpace\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ErrorManager.h">
+    <ClInclude Include="src\etherSpace\ErrorManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Color.h">
+    <ClInclude Include="src\etherSpace\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Vector.h">
+    <ClInclude Include="src\etherSpace\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Object.h">
+    <ClInclude Include="src\etherSpace\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Component.h">
+    <ClInclude Include="src\etherSpace\Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Shape.h">
+    <ClInclude Include="src\etherSpace\Shape.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\EntryPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\Core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace.h">
+      <Filter>Exporter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

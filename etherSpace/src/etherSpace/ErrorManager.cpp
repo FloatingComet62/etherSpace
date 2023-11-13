@@ -1,6 +1,8 @@
 #include "ErrorManager.h"
 
-std::string errorTypeToString(eErrorType_t error_type) {
+using namespace etherSpace;
+
+std::string etherSpace::errorTypeToString(eErrorType_t error_type) {
 	switch (error_type) {
 	case eErrorType_t::NONE:
 		return "None";

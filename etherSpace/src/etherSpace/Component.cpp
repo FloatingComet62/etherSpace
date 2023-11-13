@@ -3,9 +3,9 @@
 #include "Object.h"
 #include "ErrorManager.h"
 
-using namespace Components;
+using namespace etherSpace::Components;
 
-std::string Components::signatureToString(ComponentSignature componentSignature) {
+std::string signatureToString(ComponentSignature componentSignature) {
 	switch (componentSignature) {
 	case ComponentSignature::TRANSFORM:
 		return "Transform";
@@ -21,17 +21,21 @@ Transform::Transform(Object* object, v2 position, v2 rotation) {
 	this->position = position;
 	this->rotation = rotation;
 }
+
 void Transform::start() {}
+
 void Transform::update() {}
+
 ComponentSignature Transform::signature() {
 	return ComponentSignature::TRANSFORM;
 }
 
-Renderer::Renderer(Object* object, Shapes::Shape shape, Color color)
+Renderer::Renderer(Object* object, Shapes::Shape* shape, Color color)
 	: shape(shape), transform(nullptr) {
 	this->object = object;
 	this->color = color;
 }
+
 void Renderer::start() {
 	auto res = this->object->getComponent(ComponentSignature::TRANSFORM);
 	if (!res.second) {
@@ -40,7 +44,9 @@ void Renderer::start() {
 	}
 	this->transform = (Components::Transform*)res.first;
 }
+
 void Renderer::update() {}
+
 ComponentSignature Renderer::signature() {
 	return ComponentSignature::RENDERER;
 }

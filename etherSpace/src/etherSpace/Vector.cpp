@@ -1,11 +1,13 @@
 #include "Vector.h"
 
+using namespace etherSpace;
+
 v2::v2(float i, float j) {
 	this->i = i;
 	this->j = j;
 }
 
-std::string v2::toString() {
+std::string v2::toString() const {
 	return "v2 { i: "
 		+ std::to_string(this->i)
 		+ ", j: " + std::to_string(this->j)
@@ -24,7 +26,7 @@ v3::v3(v2 vec) {
 	this->k = 0;
 }
 
-std::string v3::toString() {
+std::string v3::toString() const {
 	return "v3 { i: "
 		+ std::to_string(this->i)
 		+ ", j: " + std::to_string(this->j)
