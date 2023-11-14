@@ -1,8 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-
 namespace etherSpace {
 	typedef enum {
 		NONE, TEST, INVALID_HEX_STRING, MISSING_REQUIRED_COMPONENT

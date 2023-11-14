@@ -1,6 +1,5 @@
+#include "es_pch.h"
 #include "Color.h"
-
-#include <iostream>
 
 #include "ErrorManager.h"
 

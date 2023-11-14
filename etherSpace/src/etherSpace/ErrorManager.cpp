@@ -1,3 +1,4 @@
+#include "es_pch.h"
 #include "ErrorManager.h"
 
 #include "Log.h"

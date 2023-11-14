@@ -15,7 +15,7 @@ project "Sandbox"
   language "C++"
 
   targetdir ("bin/" .. outputDir .. "/%{prj.name}")
-  objdir ("bin-int/" .. outputDir .. "/%{prj.name}")
+  objdir ("bin/int/" .. outputDir .. "/%{prj.name}")
 
   files {
     "%{prj.name}/src/**.h",
@@ -57,16 +57,19 @@ project "EtherSpace"
   language "C++"
 
   targetdir ("bin/" .. outputDir .. "/%{prj.name}")
-  objdir ("bin-int/" .. outputDir .. "/%{prj.name}")
+  objdir ("bin/int/" .. outputDir .. "/%{prj.name}")
+
+  pchheader "es_pch.h"
+  pchsource "%{prj.name}/src/es_pch.cpp"
 
   files {
     "%{prj.name}/src/**.h",
     "%{prj.name}/src/**.cpp"
   }
 
-  -- includedirs {
-  --   ""
-  -- }
+  includedirs {
+    "etherSpace/src"
+  }
 
   filter "system:windows"
     cppdialect "C++17"

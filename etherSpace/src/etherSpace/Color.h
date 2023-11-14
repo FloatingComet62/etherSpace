@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <array>
-#include <cstdint>
-
 namespace etherSpace {
 	class Color {
 	public:

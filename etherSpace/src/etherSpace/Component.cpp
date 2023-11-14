@@ -1,3 +1,4 @@
+#include "es_pch.h"
 #include "Component.h"
 
 #include "Object.h"

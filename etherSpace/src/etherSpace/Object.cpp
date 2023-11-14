@@ -1,3 +1,4 @@
+#include "es_pch.h"
 #include "Object.h"
 
 using namespace etherSpace;

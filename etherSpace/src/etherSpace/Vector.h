@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace etherSpace {
 	class v2 {
 	public:

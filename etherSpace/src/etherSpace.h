@@ -2,6 +2,7 @@
 
 // For use by external programs
 
+#include "es_pch.h"
 #include "etherSpace/Core.h"
 
 #include "etherSpace/Application.h"

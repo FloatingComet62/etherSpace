@@ -2,8 +2,6 @@
 
 #include "Core.h"
 
-#include <string>
-
 namespace etherSpace {
 	enum ConsoleColors {
 		BLACK = 30,

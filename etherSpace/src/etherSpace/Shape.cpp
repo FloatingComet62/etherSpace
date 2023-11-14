@@ -1,3 +1,4 @@
+#include "es_pch.h"
 #include "Shape.h"
 
 using namespace etherSpace::Shapes;

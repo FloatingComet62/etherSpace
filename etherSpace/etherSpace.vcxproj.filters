@@ -6,6 +6,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\es_pch.h" />
     <ClInclude Include="src\etherSpace.h" />
     <ClInclude Include="src\etherSpace\Application.h">
       <Filter>etherSpace</Filter>
@@ -39,6 +40,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\es_pch.cpp" />
     <ClCompile Include="src\etherSpace\Application.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>

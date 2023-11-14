@@ -1,8 +1,5 @@
+#include "es_pch.h"
 #include "Log.h"
-
-#include <stdlib.h>
-#include <iostream>
-#include <stdexcept>
 
 #ifndef ES_DIST
 // https://stackoverflow.com/a/26221725/15058455
