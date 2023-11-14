@@ -1,5 +1,7 @@
 #include "ErrorManager.h"
 
+#include "Log.h"
+
 using namespace etherSpace;
 
 std::string etherSpace::errorTypeToString(eErrorType_t error_type) {
@@ -32,15 +34,18 @@ bool ErrorManager::hasError() {
 	return this->error_type != eErrorType_t::NONE;
 }
 
-void ErrorManager::sendError(eErrorType_t error_type, std::string error_message) {
+void ErrorManager::sendError(eErrorType_t error_type, const std::string& error_message) {
 	if (this->ignore_consecutive_errors_with_same_code && this->error_type == error_type) {
 		return;
 	}
 	this->error_message = error_message;
 	this->error_type = error_type;
 
-	std::cout << "Error Code: " << errorTypeToString(error_type)
-		<< "\nError Received: " << error_message << std::endl;
+	std::string message = "[";
+	message += errorTypeToString(error_type);
+	message += "] ";
+	message += error_message;
+	Log::critical(message);
 }
 
 void ErrorManager::clearError() {

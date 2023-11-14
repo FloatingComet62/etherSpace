@@ -1,71 +1,67 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Exporter">
-      <UniqueIdentifier>{2692f487-cf69-4e97-be82-b0fef6c7db58}</UniqueIdentifier>
+    <Filter Include="etherSpace">
+      <UniqueIdentifier>{09E7BDFF-F59E-FF4C-5EA6-D8A84A7D9A3D}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\etherSpace\ErrorManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\Color.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\Vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\Shape.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\etherSpace\ErrorManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\etherSpace.h" />
+    <ClInclude Include="src\etherSpace\Application.h">
+      <Filter>etherSpace</Filter>
     </ClInclude>
     <ClInclude Include="src\etherSpace\Color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\etherSpace\Vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\etherSpace\Object.h">
-      <Filter>Header Files</Filter>
+      <Filter>etherSpace</Filter>
     </ClInclude>
     <ClInclude Include="src\etherSpace\Component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\etherSpace\Shape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\etherSpace\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\etherSpace\EntryPoint.h">
-      <Filter>Header Files</Filter>
+      <Filter>etherSpace</Filter>
     </ClInclude>
     <ClInclude Include="src\etherSpace\Core.h">
-      <Filter>Header Files</Filter>
+      <Filter>etherSpace</Filter>
     </ClInclude>
-    <ClInclude Include="src\etherSpace.h">
-      <Filter>Exporter</Filter>
+    <ClInclude Include="src\etherSpace\EntryPoint.h">
+      <Filter>etherSpace</Filter>
     </ClInclude>
+    <ClInclude Include="src\etherSpace\ErrorManager.h">
+      <Filter>etherSpace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\Log.h">
+      <Filter>etherSpace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\Object.h">
+      <Filter>etherSpace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\Shape.h">
+      <Filter>etherSpace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\Vector.h">
+      <Filter>etherSpace</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\etherSpace\Application.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\Color.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\Component.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\ErrorManager.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\Log.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\Object.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\Shape.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\Vector.cpp">
+      <Filter>etherSpace</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,13 +1,10 @@
 #include <iostream>
 #include <etherSpace.h>
 
-// #include "Object.h"
-// #include "Component.h"
-
 class Sandbox : public etherSpace::Application {
 public:
 	Sandbox() {
-		std::cout << "Hello from Sandbox";
+		etherSpace::Log::info("Sandbox Initialized");
 	};
 	~Sandbox() {
 

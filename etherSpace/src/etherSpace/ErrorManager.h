@@ -12,15 +12,15 @@ namespace etherSpace {
 
 	class ErrorManager {
 	public:
-		ErrorManager(ErrorManager const*) = delete;
-		void operator=(ErrorManager const*) = delete;
 		static ErrorManager* getInstance();
 		bool hasError();
-		void sendError(eErrorType_t error_type, std::string error_message);
+		void sendError(eErrorType_t error_type, const std::string& error_message);
 		void clearError();
 		std::pair<eErrorType_t, std::string> getError();
 		void ignoreConsecutiveErrorsWithSameCode(bool value);
 	private:
+		ErrorManager(ErrorManager const*) = delete;
+		void operator=(ErrorManager const*) = delete;
 		std::string error_message;
 		eErrorType_t error_type;
 		bool ignore_consecutive_errors_with_same_code;
