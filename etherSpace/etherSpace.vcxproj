@@ -152,28 +152,28 @@
     <ClInclude Include="src\es_pch.h" />
     <ClInclude Include="src\etherSpace.h" />
     <ClInclude Include="src\etherSpace\Application.h" />
-    <ClInclude Include="src\etherSpace\Color.h" />
+    <ClInclude Include="src\etherSpace\modules\Color.h" />
     <ClInclude Include="src\etherSpace\Component.h" />
     <ClInclude Include="src\etherSpace\Core.h" />
     <ClInclude Include="src\etherSpace\EntryPoint.h" />
-    <ClInclude Include="src\etherSpace\ErrorManager.h" />
-    <ClInclude Include="src\etherSpace\Log.h" />
+    <ClInclude Include="src\etherSpace\modules\ErrorManager.h" />
+    <ClInclude Include="src\etherSpace\modules\Log.h" />
     <ClInclude Include="src\etherSpace\Object.h" />
     <ClInclude Include="src\etherSpace\Shape.h" />
-    <ClInclude Include="src\etherSpace\Vector.h" />
+    <ClInclude Include="src\etherSpace\modules\Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\es_pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\etherSpace\Application.cpp" />
-    <ClCompile Include="src\etherSpace\Color.cpp" />
+    <ClCompile Include="src\etherSpace\modules\Color.cpp" />
     <ClCompile Include="src\etherSpace\Component.cpp" />
-    <ClCompile Include="src\etherSpace\ErrorManager.cpp" />
-    <ClCompile Include="src\etherSpace\Log.cpp" />
+    <ClCompile Include="src\etherSpace\modules\ErrorManager.cpp" />
+    <ClCompile Include="src\etherSpace\modules\Log.cpp" />
     <ClCompile Include="src\etherSpace\Object.cpp" />
     <ClCompile Include="src\etherSpace\Shape.cpp" />
-    <ClCompile Include="src\etherSpace\Vector.cpp" />
+    <ClCompile Include="src\etherSpace\modules\Vector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,8 @@
 #include "es_pch.h"
 #include "Log.h"
 
+using namespace etherSpace;
+
 #ifndef ES_DIST
 // https://stackoverflow.com/a/26221725/15058455
 template<typename ... Args>
@@ -13,11 +15,7 @@ std::string string_format(const std::string& format, Args ... args)
     std::snprintf(buf.get(), size, format.c_str(), args ...);
     return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
-#endif
 
-using namespace etherSpace;
-
-#ifndef ES_DIST
 std::string convertColorToCode(ConsoleColors color) {
 	if (color == ConsoleColors::RESET) {
 		return "\033[0m";

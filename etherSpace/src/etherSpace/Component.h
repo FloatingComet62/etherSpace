@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Vector.h"
+#include "modules/Vector.h"
+#include "modules/Color.h"
 #include "Shape.h"
-#include "Color.h"
 
 namespace etherSpace {
 	class Object;

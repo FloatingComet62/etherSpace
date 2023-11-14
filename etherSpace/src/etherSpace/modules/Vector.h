@@ -21,6 +21,6 @@ namespace etherSpace {
 		std::string toString() const;
 	};
 
-	float dot(v3 vec1, v3 vec2);
-	v3 cross(v3 vec1, v3 vec2);
+	float dot(const v3& vec1, const v3& vec2);
+	v3 cross(const v3& vec1, const v3& vec2);
 };

@@ -11,7 +11,7 @@
     <ClInclude Include="src\etherSpace\Application.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
-    <ClInclude Include="src\etherSpace\Color.h">
+    <ClInclude Include="src\etherSpace\modules\Color.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
     <ClInclude Include="src\etherSpace\Component.h">
@@ -23,10 +23,10 @@
     <ClInclude Include="src\etherSpace\EntryPoint.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
-    <ClInclude Include="src\etherSpace\ErrorManager.h">
+    <ClInclude Include="src\etherSpace\modules\ErrorManager.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
-    <ClInclude Include="src\etherSpace\Log.h">
+    <ClInclude Include="src\etherSpace\modules\Log.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
     <ClInclude Include="src\etherSpace\Object.h">
@@ -35,7 +35,7 @@
     <ClInclude Include="src\etherSpace\Shape.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
-    <ClInclude Include="src\etherSpace\Vector.h">
+    <ClInclude Include="src\etherSpace\modules\Vector.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,16 +44,16 @@
     <ClCompile Include="src\etherSpace\Application.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
-    <ClCompile Include="src\etherSpace\Color.cpp">
+    <ClCompile Include="src\etherSpace\modules\Color.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
     <ClCompile Include="src\etherSpace\Component.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
-    <ClCompile Include="src\etherSpace\ErrorManager.cpp">
+    <ClCompile Include="src\etherSpace\modules\ErrorManager.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
-    <ClCompile Include="src\etherSpace\Log.cpp">
+    <ClCompile Include="src\etherSpace\modules\Log.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
     <ClCompile Include="src\etherSpace\Object.cpp">
@@ -62,7 +62,7 @@
     <ClCompile Include="src\etherSpace\Shape.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
-    <ClCompile Include="src\etherSpace\Vector.cpp">
+    <ClCompile Include="src\etherSpace\modules\Vector.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
   </ItemGroup>

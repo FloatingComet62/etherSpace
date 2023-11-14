@@ -35,10 +35,10 @@ std::string v3::toString() const {
 		+ " }";
 }
 
-float dot(v3 vec1, v3 vec2) {
+float etherSpace::dot(const v3& vec1, const v3& vec2) {
 	return vec1.i * vec2.i + vec1.j * vec2.j + vec1.k * vec2.k;
 }
-v3 cross(v3 vec1, v3 vec2) {
+v3 etherSpace::cross(const v3& vec1, const v3& vec2) {
 	return v3(
 		vec1.j * vec2.k - vec1.k * vec2.j,
 	  - vec1.i * vec2.k + vec1.k * vec2.i,

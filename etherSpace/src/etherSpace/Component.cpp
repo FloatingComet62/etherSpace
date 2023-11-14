@@ -2,11 +2,11 @@
 #include "Component.h"
 
 #include "Object.h"
-#include "ErrorManager.h"
+#include "modules/ErrorManager.h"
 
 using namespace etherSpace::Components;
 
-std::string signatureToString(ComponentSignature componentSignature) {
+std::string etherSpace::Components::signatureToString(ComponentSignature componentSignature) {
 	switch (componentSignature) {
 	case ComponentSignature::TRANSFORM:
 		return "Transform";
