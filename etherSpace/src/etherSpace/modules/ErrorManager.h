@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Core.h"
+
 namespace etherSpace {
 	typedef enum {
 		NONE, TEST, INVALID_HEX_STRING, MISSING_REQUIRED_COMPONENT
@@ -7,13 +9,13 @@ namespace etherSpace {
 
 	std::string errorTypeToString(eErrorType_t error_type);
 
-	class ErrorManager {
+	class ES_API ErrorManager {
 	public:
 		static ErrorManager* getInstance();
-		bool hasError();
+		bool hasError() const;
 		void sendError(eErrorType_t error_type, const std::string& error_message);
 		void clearError();
-		std::pair<eErrorType_t, std::string> getError();
+		std::pair<eErrorType_t, std::string> getError() const;
 		void ignoreConsecutiveErrorsWithSameCode(bool value);
 	private:
 		ErrorManager(ErrorManager const*) = delete;

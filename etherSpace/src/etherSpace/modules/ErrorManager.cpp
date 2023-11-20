@@ -31,7 +31,7 @@ ErrorManager* ErrorManager::getInstance() {
 	return &instance_ptr;
 }
 
-bool ErrorManager::hasError() {
+bool ErrorManager::hasError() const {
 	return this->error_type != eErrorType_t::NONE;
 }
 
@@ -54,7 +54,7 @@ void ErrorManager::clearError() {
 	this->error_message = "";
 }
 
-std::pair<eErrorType_t, std::string> ErrorManager::getError() {
+std::pair<eErrorType_t, std::string> ErrorManager::getError() const {
 	return std::make_pair(this->error_type, this->error_message);
 }
 

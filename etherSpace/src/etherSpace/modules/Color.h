@@ -1,7 +1,9 @@
 #pragma once
 
+#include "../Core.h"
+
 namespace etherSpace {
-	class Color {
+	class ES_API Color {
 	public:
 		uint8_t red;
 		uint8_t green;

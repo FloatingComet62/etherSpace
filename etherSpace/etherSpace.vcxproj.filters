@@ -4,14 +4,14 @@
     <Filter Include="etherSpace">
       <UniqueIdentifier>{09E7BDFF-F59E-FF4C-5EA6-D8A84A7D9A3D}</UniqueIdentifier>
     </Filter>
+    <Filter Include="etherSpace\modules">
+      <UniqueIdentifier>{F104F7FF-DDE8-B755-4649-B2A8324CA2D7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\es_pch.h" />
     <ClInclude Include="src\etherSpace.h" />
     <ClInclude Include="src\etherSpace\Application.h">
-      <Filter>etherSpace</Filter>
-    </ClInclude>
-    <ClInclude Include="src\etherSpace\modules\Color.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
     <ClInclude Include="src\etherSpace\Component.h">
@@ -23,37 +23,40 @@
     <ClInclude Include="src\etherSpace\EntryPoint.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
-    <ClInclude Include="src\etherSpace\modules\ErrorManager.h">
-      <Filter>etherSpace</Filter>
-    </ClInclude>
-    <ClInclude Include="src\etherSpace\modules\Log.h">
-      <Filter>etherSpace</Filter>
-    </ClInclude>
     <ClInclude Include="src\etherSpace\Object.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
     <ClInclude Include="src\etherSpace\Shape.h">
       <Filter>etherSpace</Filter>
     </ClInclude>
-    <ClInclude Include="src\etherSpace\modules\Vector.h">
-      <Filter>etherSpace</Filter>
+    <ClInclude Include="src\etherSpace\modules\Color.h">
+      <Filter>etherSpace\modules</Filter>
     </ClInclude>
+    <ClInclude Include="src\etherSpace\modules\ErrorManager.h">
+      <Filter>etherSpace\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\modules\Log.h">
+      <Filter>etherSpace\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\modules\Vector.h">
+      <Filter>etherSpace\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\etherSpace\units\core.h" />
+    <ClInclude Include="src\etherSpace\units\time.h" />
+    <ClInclude Include="src\etherSpace\units\length.h" />
+    <ClInclude Include="src\etherSpace\units\mass.h" />
+    <ClInclude Include="src\etherSpace\units\current.h" />
+    <ClInclude Include="src\etherSpace\units\temperature.h" />
+    <ClInclude Include="src\etherSpace\units\mole.h" />
+    <ClInclude Include="src\etherSpace\units\luminosity.h" />
+    <ClInclude Include="src\etherSpace\Units.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\es_pch.cpp" />
     <ClCompile Include="src\etherSpace\Application.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
-    <ClCompile Include="src\etherSpace\modules\Color.cpp">
-      <Filter>etherSpace</Filter>
-    </ClCompile>
     <ClCompile Include="src\etherSpace\Component.cpp">
-      <Filter>etherSpace</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\modules\ErrorManager.cpp">
-      <Filter>etherSpace</Filter>
-    </ClCompile>
-    <ClCompile Include="src\etherSpace\modules\Log.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
     <ClCompile Include="src\etherSpace\Object.cpp">
@@ -62,8 +65,18 @@
     <ClCompile Include="src\etherSpace\Shape.cpp">
       <Filter>etherSpace</Filter>
     </ClCompile>
-    <ClCompile Include="src\etherSpace\modules\Vector.cpp">
-      <Filter>etherSpace</Filter>
+    <ClCompile Include="src\etherSpace\modules\Color.cpp">
+      <Filter>etherSpace\modules</Filter>
     </ClCompile>
+    <ClCompile Include="src\etherSpace\modules\ErrorManager.cpp">
+      <Filter>etherSpace\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\modules\Log.cpp">
+      <Filter>etherSpace\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\modules\Vector.cpp">
+      <Filter>etherSpace\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\etherSpace\units\core.cpp" />
   </ItemGroup>
 </Project>

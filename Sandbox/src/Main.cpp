@@ -1,15 +1,17 @@
 #include <etherSpace.h>
 
-class Sandbox : public etherSpace::Application {
+using namespace etherSpace;
+
+class Sandbox : public Application {
 public:
 	Sandbox() {
-		etherSpace::Log::info("Sandbox Initialized");
+		Log::info("Sandbox Initialized");
+		units::unit x = units::meter * units::second;
+		std::cout << x.toString();
 	};
-	~Sandbox() {
-
-	}
+	~Sandbox() {}
 };
 
-etherSpace::Application* etherSpace::createApplication() {
+Application* etherSpace::createApplication() {
 	return new Sandbox();
 }

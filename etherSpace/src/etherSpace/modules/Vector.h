@@ -1,7 +1,9 @@
 #pragma once
 
+#include "../Core.h"
+
 namespace etherSpace {
-	class v2 {
+	class ES_API v2 {
 	public:
 		float i;
 		float j;
@@ -10,7 +12,7 @@ namespace etherSpace {
 		std::string toString() const;
 	};
 
-	class v3 {
+	class ES_API v3 {
 	public:
 		float i;
 		float j;
