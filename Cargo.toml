@@ -1,0 +1,11 @@
+[package]
+name = "ether_space"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+colored = "2.0.4"
+ggez = "0.9.3"
+random-number = "0.1.8"
