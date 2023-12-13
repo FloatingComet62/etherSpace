@@ -6,25 +6,26 @@ use crate::{
     serializer::{serializer, serializer_invec, SerialItem, Serialize},
 };
 
-use super::Component;
+use super::{Component, ComponentSignature};
 
 pub struct Transform {
     pub id: u32,
     pub position: Vector2<f64>,
-    pub velocity: Vector2<f64>,
 }
 impl Transform {
     pub fn new() -> Self {
         Self {
             id: random!(),
             position: Vector2::new(0.0, 0.0),
-            velocity: Vector2::new(0.0, 0.0),
         }
     }
 }
 impl Component for Transform {
-    fn start(&mut self, _object: &Object) {}
-    fn update(&mut self, _object: &Object) {}
+    fn start(&mut self, _object: &mut Object) {}
+    fn update(&mut self, _object: &mut Object) {}
+    fn signature(&self) -> ComponentSignature {
+        ComponentSignature::Transform
+    }
 }
 impl Serialize for Transform {
     fn serialize(&self) -> String {
@@ -35,7 +36,6 @@ impl Serialize for Transform {
         [
             SerialItem::new_str("id", self.id.to_string()),
             SerialItem::new_str("position", vec_printer(&self.position)),
-            SerialItem::new_str("velocity", vec_printer(&self.velocity)),
         ]
         .to_vec()
     }

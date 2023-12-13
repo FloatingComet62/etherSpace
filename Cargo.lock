@@ -708,6 +708,7 @@ name = "ether_space"
 version = "0.1.0"
 dependencies = [
  "colored",
+ "downcast-rs",
  "ggez",
  "random-number",
 ]

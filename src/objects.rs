@@ -1,5 +1,9 @@
 use super::serializer::{serializer, serializer_invec, SerialItem, Serialize};
-use crate::{components::Component, serializer::serializer_vec_nest};
+use crate::{
+    components::{Component, ComponentSignature},
+    errors::Errors,
+    serializer::serializer_vec_nest,
+};
 use random_number::random;
 
 pub struct Object {
@@ -13,8 +17,31 @@ impl Object {
             components: Vec::new(),
         }
     }
-    pub fn add_component(&mut self, component: Box<dyn Component>) {
+    pub fn add_component(&mut self, component: Box<dyn Component>) -> Result<(), Errors> {
+        if let Some(_) = self.get_component(component.signature()) {
+            return Err(Errors::DuplicateComponents);
+        }
         self.components.push(component);
+        Ok(())
+    }
+    pub fn get_component(&self, signature: ComponentSignature) -> Option<&Box<dyn Component>> {
+        for component in self.components.iter() {
+            if signature == component.signature() {
+                return Some(component);
+            }
+        }
+        return None;
+    }
+    pub fn get_component_mut(
+        &mut self,
+        signature: ComponentSignature,
+    ) -> Option<Box<&mut dyn Component>> {
+        for component in self.components.iter_mut() {
+            if signature == component.signature() {
+                return Some(Box::new(component.as_mut()));
+            }
+        }
+        return None;
     }
 }
 
