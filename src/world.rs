@@ -1,30 +1,39 @@
-use random_number::random;
-
-use crate::serializer::serializer_vec_nest;
-
-use super::log::Log;
-use super::objects::Object;
-use super::serializer::{serializer, serializer_invec, SerialItem, Serialize};
+use crate::{
+    critical,
+    modules::{
+        log::Log,
+        serializer::{serializer, serializer_invec, serializer_vec_nest, SerialItem, Serialize},
+    },
+    objects::Object,
+    registry::Registry,
+};
+use std::sync::{Arc, Mutex};
 
 pub struct World {
     id: u32,
-    objects: Vec<Object>,
+    objects: Vec<u32>,
+    registry: Arc<Mutex<Registry>>,
     pub gravity: f32,
 }
 impl World {
-    pub fn new() -> Self {
+    pub fn new(id: u32, registry: Arc<Mutex<Registry>>) -> Self {
         Self {
-            id: random!(),
+            id,
             objects: Vec::new(),
-            gravity: 10.0,
+            gravity: 9.8,
+            registry,
         }
     }
-    pub fn add_object(&mut self, object: Object) {
-        self.objects.push(object);
+    #[inline]
+    pub fn create_object(&mut self) -> Option<u32> {
+        let mut registry = self.registry.lock().ok()?;
+        let id = registry.create_object(Arc::clone(&self.registry));
+        self.objects.push(id);
+        Some(id)
     }
     pub fn load_from_file() -> Self {
-        Log::critical("Todo");
-        Self::new()
+        critical!("Todo");
+        Self::new(0, Arc::new(Mutex::new(Registry::new())))
     }
 }
 
@@ -33,9 +42,23 @@ impl Serialize for World {
         self.serialize_nest(0)
     }
     fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
+        let object_map: Vec<Object>;
+        {
+            let raw_registry = self.registry.lock();
+            if raw_registry.is_err() {
+                critical!("Registry is locked");
+                return vec![];
+            }
+            let registry = raw_registry.unwrap();
+            object_map = self
+                .objects
+                .iter()
+                .map(|obj_id| (*registry.get_object(*obj_id)).clone())
+                .collect();
+        }
         [
             SerialItem::new_str("id", self.id.to_string()),
-            SerialItem::new_str("objects", serializer_vec_nest(&self.objects, indent + 1)),
+            SerialItem::new_str("objects", serializer_vec_nest(&object_map, indent + 1)),
         ]
         .to_vec()
     }

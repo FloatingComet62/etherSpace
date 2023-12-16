@@ -1,46 +1,32 @@
-use random_number::random;
-
 use crate::{
-    log::Log,
-    modules::vector::Vector2,
+    modules::{
+        serializer::{serializer, serializer_invec, SerialItem, Serialize},
+        vector::Vector2,
+    },
     objects::Object,
-    serializer::{serializer, serializer_invec, SerialItem, Serialize},
 };
 
-use super::{transform::Transform, Component, ComponentSignature};
+use super::ComponentSignature;
 
+#[derive(Clone)]
 pub struct Translational {
     pub id: u32,
     pub velocity: Vector2<f64>,
-    transform: Option<Box<&'static mut Transform>>,
+    requires: Vec<ComponentSignature>,
 }
 impl Translational {
-    pub fn new() -> Self {
+    pub fn new(id: u32, velocity: Vector2<f64>) -> Self {
         Self {
-            id: random!(),
-            velocity: Vector2::new(0.0, 0.0),
-            transform: None,
+            id,
+            velocity,
+            requires: vec![ComponentSignature::Transform],
         }
     }
-}
-impl Component for Translational {
-    fn start(&mut self, object: &mut Object) {
-        let response = object.get_component_mut(ComponentSignature::Transform);
-        match response {
-            Some(mut res) => {
-                let t = res.as_mut();
-                let u: Option<&mut Transform> = t.downcast_mut::<Transform>();
-                if let Some(k) = u {
-                    self.transform = Some(Box::new(k));
-                }
-            }
-            None => Log::critical("Transform component is required for Translational component"),
-        }
+    pub fn get_requirements(&self) -> Vec<ComponentSignature> {
+        self.requires.clone()
     }
-    fn update(&mut self, _object: &mut Object) {}
-    fn signature(&self) -> ComponentSignature {
-        ComponentSignature::TranslationalPhysics
-    }
+    pub fn start(&mut self, _object: &mut Object) {}
+    pub fn update(&mut self, _object: &mut Object) {}
 }
 impl Serialize for Translational {
     fn serialize(&self) -> String {

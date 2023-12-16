@@ -24,9 +24,11 @@ impl SerialItem {
     }
 }
 
+#[inline]
 pub fn serializer(serial_items: Vec<SerialItem>, indent: u8) -> String {
     serializer_invec_option(indent, serial_items, false)
 }
+#[inline]
 pub fn serializer_invec(serial_items: Vec<SerialItem>, indent: u8) -> String {
     serializer_invec_option(indent, serial_items, true)
 }
@@ -66,9 +68,11 @@ pub trait Serialize {
     fn serialize_invec(&self, indent: u8) -> String;
 }
 
+#[inline]
 pub fn serializer_vec(vec: &Vec<impl Serialize>) -> String {
     serializer_vec_nest_option(vec, 0)
 }
+#[inline]
 pub fn serializer_vec_nest(vec: &Vec<impl Serialize>, indent: u8) -> String {
     serializer_vec_nest_option(vec, indent)
 }

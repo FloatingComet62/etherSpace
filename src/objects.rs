@@ -1,60 +1,92 @@
-use super::serializer::{serializer, serializer_invec, SerialItem, Serialize};
 use crate::{
-    components::{Component, ComponentSignature},
-    errors::Errors,
-    serializer::serializer_vec_nest,
+    components::ComponentSignature,
+    critical,
+    modules::{
+        log::Log,
+        serializer::{serializer, serializer_invec, serializer_vec_nest, SerialItem, Serialize},
+    },
+    registry::Registry,
 };
-use random_number::random;
+use std::sync::{Arc, Mutex};
 
+#[derive(Clone)]
 pub struct Object {
     pub id: u32,
-    components: Vec<Box<dyn Component>>,
+    components: Vec<u32>,
+    registry: Arc<Mutex<Registry>>,
 }
 impl Object {
-    pub fn new() -> Self {
+    pub fn new(id: u32, registry: Arc<Mutex<Registry>>) -> Self {
         Self {
-            id: random!(),
+            id,
             components: Vec::new(),
+            registry,
         }
     }
-    pub fn add_component(&mut self, component: Box<dyn Component>) -> Result<(), Errors> {
-        if let Some(_) = self.get_component(component.signature()) {
-            return Err(Errors::DuplicateComponents);
+    pub fn get_component(&self, signature: ComponentSignature) -> Option<u32> {
+        let raw_registry = self.registry.lock();
+        if raw_registry.is_err() {
+            critical!("Registry is locked");
+            return None;
         }
-        self.components.push(component);
-        Ok(())
-    }
-    pub fn get_component(&self, signature: ComponentSignature) -> Option<&Box<dyn Component>> {
-        for component in self.components.iter() {
-            if signature == component.signature() {
-                return Some(component);
+        let registry = raw_registry.unwrap();
+        for component_id in self.components.iter() {
+            let component = registry.get_component(*component_id);
+            if component.signature() == signature {
+                return Some(component_id.clone());
             }
         }
-        return None;
+        None
     }
-    pub fn get_component_mut(
-        &mut self,
-        signature: ComponentSignature,
-    ) -> Option<Box<&mut dyn Component>> {
-        for component in self.components.iter_mut() {
-            if signature == component.signature() {
-                return Some(Box::new(component.as_mut()));
+    pub fn get_component_ids(&self) -> Vec<u32> {
+        self.components.clone()
+    }
+    pub fn add_component(&mut self, component_id: u32) -> Option<()> {
+        {
+            let raw_registry = self.registry.lock();
+            if raw_registry.is_err() {
+                critical!("Registry is locked");
+                return None;
+            }
+            let registry = raw_registry.unwrap();
+            let component = registry.get_component(component_id);
+            if self.get_component(component.signature()).is_some() {
+                critical!(
+                    "Cannot add the same component twice ({:?}) to object ({:})",
+                    component.signature(),
+                    self.id
+                );
+                return None;
             }
         }
-        return None;
+        self.components.push(component_id);
+        return Some(());
     }
 }
-
 impl Serialize for Object {
     fn serialize(&self) -> String {
         self.serialize_nest(0)
     }
     fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
+        let component_map: Vec<Object>;
+        {
+            let raw_registry = self.registry.lock();
+            if raw_registry.is_err() {
+                critical!("Registry is locked");
+                return vec![];
+            }
+            let registry = raw_registry.unwrap();
+            component_map = self
+                .components
+                .iter()
+                .map(|obj_id| (*registry.get_object(*obj_id)).clone())
+                .collect();
+        }
         [
             SerialItem::new_str("id", self.id.to_string()),
             SerialItem::new_str(
                 "components",
-                serializer_vec_nest(&self.components, indent + 1),
+                serializer_vec_nest(&component_map, indent + 1),
             ),
         ]
         .to_vec()

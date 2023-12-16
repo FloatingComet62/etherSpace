@@ -1,31 +1,31 @@
-use random_number::random;
-
+use super::ComponentSignature;
 use crate::{
-    modules::vector::Vector2,
+    modules::{
+        serializer::{serializer, serializer_invec, SerialItem, Serialize},
+        vector::Vector2,
+    },
     objects::Object,
-    serializer::{serializer, serializer_invec, SerialItem, Serialize},
 };
 
-use super::{Component, ComponentSignature};
-
+#[derive(Clone)]
 pub struct Transform {
     pub id: u32,
     pub position: Vector2<f64>,
+    requires: Vec<ComponentSignature>,
 }
 impl Transform {
-    pub fn new() -> Self {
+    pub fn new(id: u32, position: Vector2<f64>) -> Self {
         Self {
-            id: random!(),
-            position: Vector2::new(0.0, 0.0),
+            id,
+            position,
+            requires: vec![ComponentSignature::Transform],
         }
     }
-}
-impl Component for Transform {
-    fn start(&mut self, _object: &mut Object) {}
-    fn update(&mut self, _object: &mut Object) {}
-    fn signature(&self) -> ComponentSignature {
-        ComponentSignature::Transform
+    pub fn get_requirements(&self) -> Vec<ComponentSignature> {
+        self.requires.clone()
     }
+    pub fn start(&mut self, _object: &mut Object) {}
+    pub fn update(&mut self, _object: &mut Object) {}
 }
 impl Serialize for Transform {
     fn serialize(&self) -> String {

@@ -1,38 +1,56 @@
-use crate::{objects::Object, serializer::Serialize};
-use downcast_rs::{impl_downcast, DowncastSync};
+use crate::objects::Object;
+use std::fmt::{Debug, Display};
 
-pub trait Component: Serialize + DowncastSync {
-    fn start(&mut self, object: &mut Object);
-    fn update(&mut self, object: &mut Object);
-    fn signature(&self) -> ComponentSignature;
+pub mod transform;
+pub mod translational;
+
+#[derive(Clone)]
+pub enum Component {
+    Transform(transform::Transform),
+    Translational(translational::Translational),
 }
-impl_downcast!(sync Component);
-
-// This took me 4 days to figure out
-// https://www.reddit.com/r/rust/comments/droxdg/why_arent_traits_impld_for_boxdyn_trait/
-impl Serialize for Box<dyn Component> {
-    fn serialize(&self) -> String {
-        (**self).serialize()
+impl Component {
+    pub fn start(&mut self, object: &mut Object) {
+        match self {
+            Component::Transform(component) => component.start(object),
+            Component::Translational(component) => component.start(object),
+        }
     }
-
-    fn serial_items(&self, indent: u8) -> Vec<crate::serializer::SerialItem> {
-        (**self).serial_items(indent)
+    pub fn update(&mut self, object: &mut Object) {
+        match self {
+            Component::Transform(component) => component.update(object),
+            Component::Translational(component) => component.update(object),
+        }
     }
-
-    fn serialize_nest(&self, indent: u8) -> String {
-        (**self).serialize_nest(indent)
+    pub fn signature(&self) -> ComponentSignature {
+        match self {
+            Component::Transform(_) => ComponentSignature::Transform,
+            Component::Translational(_) => ComponentSignature::TranslationalPhysics,
+        }
     }
-
-    fn serialize_invec(&self, indent: u8) -> String {
-        (**self).serialize_invec(indent)
+    pub fn get_requirements(&self) -> Vec<ComponentSignature> {
+        match self {
+            Component::Transform(component) => component.get_requirements(),
+            Component::Translational(component) => component.get_requirements(),
+        }
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum ComponentSignature {
     Transform,
     TranslationalPhysics,
 }
-
-pub mod transform;
-pub mod translational;
+impl Debug for ComponentSignature {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("{}", self))
+    }
+}
+impl Display for ComponentSignature {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            ComponentSignature::Transform => f.write_str("Transform"),
+            ComponentSignature::TranslationalPhysics => f.write_str("Translational Physics"),
+        }
+    }
+}

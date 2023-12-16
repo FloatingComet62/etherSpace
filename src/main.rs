@@ -1,37 +1,32 @@
 use ether_space::{
-    components::transform::Transform, log::Log, objects::Object, serializer::Serialize,
+    info,
+    modules::{log::Log, serializer::Serialize},
+    registry::Registry,
     world::World,
 };
+/// Note that using Mutex introduces potential for contention (threads waiting for the lock) which
+/// might affect performance. There are other synchronization primitives in Rust, like RwLock,
+/// Atomic* types, and channels (mpsc) that might be suitable depending on the specific use case.
+use std::sync::{Arc, Mutex};
 
 fn main() {
-    Log::info("Initializing");
-    let mut window = EtherSpaceEngine::new();
-    let mut object1 = Object::new();
-    if let Err(_) = object1.add_component(Box::new(Transform::new())) {
-        Log::critical("Failed to add component to object1");
-        return;
-    }
+    info!("Initializing");
 
-    let mut object2 = Object::new();
-    if let Err(_) = object2.add_component(Box::new(Transform::new())) {
-        Log::critical("Failed to add component to object2");
-        return;
-    }
-
-    window.world.add_object(object1);
-    window.world.add_object(object2);
+    let registry = Arc::new(Mutex::new(Registry::new()));
+    let mut window = EtherSpaceEngine::new(registry);
+    window.world.create_object();
     println!("{}", window.world.serialize());
 
-    Log::info("Exiting");
+    info!("Exiting");
 }
 
 struct EtherSpaceEngine {
     pub world: World,
 }
 impl EtherSpaceEngine {
-    pub fn new() -> Self {
+    pub fn new(registry: Arc<Mutex<Registry>>) -> Self {
         Self {
-            world: World::new(),
+            world: World::new(0, registry),
         }
     }
 }
