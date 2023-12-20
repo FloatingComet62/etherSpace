@@ -18,7 +18,7 @@ impl Transform {
         Self {
             id,
             position,
-            requires: vec![ComponentSignature::Transform],
+            requires: vec![],
         }
     }
     pub fn get_requirements(&self) -> Vec<ComponentSignature> {

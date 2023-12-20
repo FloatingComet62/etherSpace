@@ -9,13 +9,21 @@ use crate::{
 };
 use std::sync::{Arc, Mutex};
 
+/// # World
+/// * `id` - A unique id
+/// * `gravity` - Global gravity
+///
+/// The world contains the collection of objects
 pub struct World {
-    id: u32,
+    pub id: u32,
     objects: Vec<u32>,
     registry: Arc<Mutex<Registry>>,
     pub gravity: f32,
 }
 impl World {
+    /// Initialize the world
+    /// * `id` - ID of the world
+    /// * `registry` - The entire registry of etherSpace
     pub fn new(id: u32, registry: Arc<Mutex<Registry>>) -> Self {
         Self {
             id,
@@ -24,6 +32,9 @@ impl World {
             registry,
         }
     }
+    /// Create an object, add it to the registry and return of id if successful
+    /// ### Returns
+    /// ID of object created
     #[inline]
     pub fn create_object(&mut self) -> Option<u32> {
         let mut registry = self.registry.lock().ok()?;
@@ -31,6 +42,7 @@ impl World {
         self.objects.push(id);
         Some(id)
     }
+    /// Load the world from a file
     pub fn load_from_file() -> Self {
         critical!("Todo");
         Self::new(0, Arc::new(Mutex::new(Registry::new())))

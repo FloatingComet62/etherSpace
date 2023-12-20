@@ -30,10 +30,12 @@ impl Registry {
         self.component.get_component(component_id)
     }
     #[inline]
+    pub fn get_component_mut(&mut self, component_id: u32) -> &mut Component {
+        self.component.get_component_mut(component_id)
+    }
+    #[inline]
     pub fn create_object(&mut self, reference: Arc<Mutex<Registry>>) -> u32 {
-        // TODO
-        self.object.create_object(Arc::clone(&reference));
-        0
+        self.object.create_object(Arc::clone(&reference))
     }
     #[inline]
     pub fn add_component(&mut self, object_id: u32, component_id: u32) {

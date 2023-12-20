@@ -10,6 +10,12 @@ pub enum Component {
     Translational(translational::Translational),
 }
 impl Component {
+    pub fn get_id(&self) -> u32 {
+        match self {
+            Component::Transform(component) => component.id,
+            Component::Translational(component) => component.id,
+        }
+    }
     pub fn start(&mut self, object: &mut Object) {
         match self {
             Component::Transform(component) => component.start(object),

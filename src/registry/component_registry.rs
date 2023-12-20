@@ -29,4 +29,8 @@ impl ComponentRegistry {
     pub fn get_component(&self, component_id: u32) -> &Component {
         &self.component[component_id as usize]
     }
+    #[inline]
+    pub fn get_component_mut(&mut self, component_id: u32) -> &mut Component {
+        &mut self.component[component_id as usize]
+    }
 }
