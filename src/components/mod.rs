@@ -1,4 +1,4 @@
-use crate::objects::Object;
+use crate::{modules::serializer::Serialize, objects::Object, SerialItem};
 use std::fmt::{Debug, Display};
 
 pub mod transform;
@@ -57,6 +57,35 @@ impl Display for ComponentSignature {
         match &self {
             ComponentSignature::Transform => f.write_str("Transform"),
             ComponentSignature::TranslationalPhysics => f.write_str("Translational Physics"),
+        }
+    }
+}
+impl Serialize for Component {
+    fn serialize(&self) -> String {
+        match &self {
+            Component::Transform(component) => component.serialize(),
+            Component::Translational(component) => component.serialize(),
+        }
+    }
+
+    fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
+        match &self {
+            Component::Transform(component) => component.serial_items(indent),
+            Component::Translational(component) => component.serial_items(indent),
+        }
+    }
+
+    fn serialize_nest(&self, indent: u8) -> String {
+        match &self {
+            Component::Transform(component) => component.serialize_nest(indent),
+            Component::Translational(component) => component.serialize_nest(indent),
+        }
+    }
+
+    fn serialize_invec(&self, indent: u8) -> String {
+        match &self {
+            Component::Transform(component) => component.serialize_invec(indent),
+            Component::Translational(component) => component.serialize_invec(indent),
         }
     }
 }

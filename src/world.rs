@@ -3,6 +3,7 @@ use crate::{
     modules::{
         log::Log,
         serializer::{serializer, serializer_invec, serializer_vec_nest, SerialItem, Serialize},
+        vector::Vector2,
     },
     objects::Object,
     registry::Registry,
@@ -40,6 +41,9 @@ impl World {
         let mut registry = self.registry.lock().ok()?;
         let id = registry.create_object(Arc::clone(&self.registry));
         self.objects.push(id);
+
+        let comp_id = registry.create_transform(Vector2::default());
+        registry.add_component(id, comp_id);
         Some(id)
     }
     /// Load the world from a file

@@ -19,7 +19,7 @@ impl ObjectRegistry {
     #[inline]
     pub fn add_component(&mut self, object_id: u32, component_id: u32) {
         self.objects[object_id as usize]
-            .get_component_ids()
+            .get_component_ids_mut()
             .push(component_id);
     }
     #[inline]

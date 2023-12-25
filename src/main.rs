@@ -15,6 +15,7 @@ fn main() {
     let registry = Arc::new(Mutex::new(Registry::new()));
     let mut window = EtherSpaceEngine::new(registry);
     window.world.create_object();
+    window.world.create_object();
     println!("{}", window.world.serialize());
 
     info!("Exiting");

@@ -116,8 +116,11 @@ impl Object {
         None
     }
     /// Get the entire vector of components ID
-    pub fn get_component_ids(&self) -> Vec<u32> {
-        self.components.clone()
+    pub fn get_component_ids(&self) -> &Vec<u32> {
+        &self.components
+    }
+    pub fn get_component_ids_mut(&mut self) -> &mut Vec<u32> {
+        &mut self.components
     }
     /// Add a component to the object
     /// * `component_id` - Component ID of the component to add
@@ -184,7 +187,7 @@ impl Serialize for Object {
         self.serialize_nest(0)
     }
     fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
-        let component_map: Vec<Object>;
+        let component_map: Vec<Component>;
         {
             let raw_registry = self.registry.lock();
             if raw_registry.is_err() {
@@ -195,7 +198,7 @@ impl Serialize for Object {
             component_map = self
                 .components
                 .iter()
-                .map(|obj_id| (*registry.get_object(*obj_id)).clone())
+                .map(|comp_id| (*registry.get_component(*comp_id)).clone())
                 .collect();
         }
         [
