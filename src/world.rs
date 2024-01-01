@@ -49,7 +49,6 @@ impl World {
     /// Load the world from a file
     pub fn load_from_file() -> Self {
         critical!("Todo");
-        Self::new(0, Arc::new(Mutex::new(Registry::new())))
     }
 }
 
@@ -63,7 +62,6 @@ impl Serialize for World {
             let raw_registry = self.registry.lock();
             if raw_registry.is_err() {
                 critical!("Registry is locked");
-                return vec![];
             }
             let registry = raw_registry.unwrap();
             object_map = self

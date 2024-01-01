@@ -1,6 +1,10 @@
 use ether_space::{
     info,
-    modules::{log::Log, serializer::Serialize},
+    modules::{
+        log::Log,
+        serializer::Serialize,
+        units::{generate_powers_from_unit_str, Unit, Units},
+    },
     registry::Registry,
     world::World,
 };
@@ -11,6 +15,11 @@ use std::sync::{Arc, Mutex};
 
 fn main() {
     info!("Initializing");
+    println!(
+        "{:?}",
+        generate_powers_from_unit_str("kgm^2mol^-1".to_string())
+    );
+    std::process::exit(0);
 
     let registry = Arc::new(Mutex::new(Registry::new()));
     let mut window = EtherSpaceEngine::new(registry);

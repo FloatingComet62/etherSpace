@@ -13,7 +13,7 @@ impl Log {
         println!("[{}] {}", "Error".bold().red(), message);
         std::process::exit(1);
     }
-    pub fn critical_debug(file: &str, line: u32, message: &str) {
+    pub fn critical_debug(file: &str, line: u32, message: &str) -> ! {
         println!("[{}][{}:{}] {}", "Error".bold().red(), file, line, message);
         std::process::exit(1);
     }

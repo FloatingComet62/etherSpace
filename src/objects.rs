@@ -104,7 +104,6 @@ impl Object {
         let raw_registry = self.registry.lock();
         if raw_registry.is_err() {
             critical!("Registry is locked");
-            return None;
         }
         let registry = raw_registry.unwrap();
         for component_id in self.components.iter() {
@@ -129,7 +128,6 @@ impl Object {
             let raw_registry = self.registry.lock();
             if raw_registry.is_err() {
                 critical!("Registry is locked");
-                return None;
             }
             let registry = raw_registry.unwrap();
             let component = registry.get_component(component_id);
@@ -139,7 +137,6 @@ impl Object {
                     component.signature(),
                     self.id
                 );
-                return None;
             }
         }
         self.components.push(component_id);
@@ -150,7 +147,6 @@ impl Object {
         let raw_registry = self.registry.lock();
         if raw_registry.is_err() {
             critical!("Registry is locked");
-            return;
         }
         let mut registry = raw_registry.unwrap();
         let mut binding = self
@@ -172,7 +168,6 @@ impl Object {
         let raw_registry = self.registry.lock();
         if raw_registry.is_err() {
             critical!("Registry is locked");
-            return;
         }
         let mut registry = raw_registry.unwrap();
 
@@ -192,7 +187,6 @@ impl Serialize for Object {
             let raw_registry = self.registry.lock();
             if raw_registry.is_err() {
                 critical!("Registry is locked");
-                return vec![];
             }
             let registry = raw_registry.unwrap();
             component_map = self
