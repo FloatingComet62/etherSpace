@@ -1,6 +1,6 @@
 use crate::{critical, modules::log::Log};
 use core::fmt::Display;
-use std::ops;
+use std::{collections::BTreeSet, ops};
 
 pub enum Units {
     Meter,
@@ -69,9 +69,9 @@ impl Units {
     }
 }
 
-pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], Vec<String>) {
+pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], BTreeSet<String>) {
     let mut powers = vec![0.0; 7];
-    let mut composite_units_used = vec![];
+    let mut composite_units_used = BTreeSet::new();
     let slash_index = units_str.find("/").unwrap_or(units_str.len());
 
     for (unit_str, composite_unit) in Units::composite().iter() {
@@ -79,7 +79,7 @@ pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], 
         if let None = possibly_index {
             continue;
         }
-        composite_units_used.push(unit_str.clone());
+        composite_units_used.insert(unit_str.clone());
         let index = possibly_index.unwrap();
         let fraction_coefficient = if slash_index > index { 1.0 } else { -1.0 };
         let carrot_index = index + unit_str.len();
@@ -100,10 +100,7 @@ pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], 
         }
         let mut digits = String::new();
         let mut sign = 1.0;
-        for digit in chars {
-            if digit == '.' {
-                continue;
-            }
+        for digit in chars.filter(|digit| *digit != '.') {
             if digit == '-' {
                 sign = -1.0;
                 continue;
@@ -128,9 +125,10 @@ pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], 
         }
     }
 
-    for (i, power) in generate_powers_from_unit_str(units_str).iter().enumerate() {
-        powers[i] += *power;
-    }
+    generate_powers_from_unit_str(units_str)
+        .iter()
+        .enumerate()
+        .for_each(|(i, power)| powers[i] += *power);
 
     (
         powers.try_into().unwrap_or_else(|_| {
@@ -166,10 +164,7 @@ fn generate_powers_from_unit_str(units_str: String) -> [f64; 7] {
         }
         let mut digits = String::new();
         let mut sign = 1.0;
-        for digit in chars {
-            if digit == '.' {
-                continue;
-            }
+        for digit in chars.filter(|digit| *digit != '.') {
             if digit == '-' {
                 sign = -1.0;
                 continue;
@@ -190,7 +185,7 @@ fn generate_powers_from_unit_str(units_str: String) -> [f64; 7] {
         critical!("Impossible");
     })
 }
-fn generate_unit_str_from_powers_composite(data: ([f64; 7], Vec<String>)) -> String {
+fn generate_unit_str_from_powers_composite(data: ([f64; 7], BTreeSet<String>)) -> String {
     let powers = data.0;
     let mut numerator_str = String::new();
     let mut denominator_str = String::new();
@@ -267,7 +262,7 @@ fn generate_unit_str_from_powers_composite(data: ([f64; 7], Vec<String>)) -> Str
         } else {
             denominator_str += &best_unit.2;
         }
-        new_data.push(best_unit.2.clone());
+        new_data.insert(best_unit.2.clone());
 
         let normal_unit_str_data = generate_unit_str_from_powers_composite((new_powers, new_data));
         let normal_unit_str: Vec<&str> = normal_unit_str_data.split('/').collect();
@@ -351,14 +346,14 @@ macro_rules! unit {
 pub struct Unit {
     pub value: f64,
     pub powers: [f64; 7],
-    composites_used: Vec<String>,
+    composites_used: BTreeSet<String>,
 }
 impl Unit {
     pub fn new(value: f64, powers: [f64; 7]) -> Self {
         let mut unit = Self {
             value,
             powers,
-            composites_used: vec![],
+            composites_used: BTreeSet::new(),
         };
         unit.check_for_composite();
         unit
@@ -378,12 +373,12 @@ impl Unit {
                     v.len()
                 );
             }),
-            composites_used: vec![],
+            composites_used: BTreeSet::new(),
         };
         unit.check_for_composite();
         unit
     }
-    pub fn new_composite(value: f64, data: ([f64; 7], Vec<String>)) -> Self {
+    pub fn new_composite(value: f64, data: ([f64; 7], BTreeSet<String>)) -> Self {
         let mut unit = Self {
             value,
             powers: data.0,
@@ -392,7 +387,7 @@ impl Unit {
         unit.check_for_composite();
         unit
     }
-    pub fn new_composite_from_vec(value: f64, data: (Vec<f64>, Vec<String>)) -> Self {
+    pub fn new_composite_from_vec(value: f64, data: (Vec<f64>, BTreeSet<String>)) -> Self {
         let mut unit = Self {
             value,
             powers: data.0.try_into().unwrap_or_else(|v: Vec<f64>| {
@@ -413,7 +408,7 @@ impl Unit {
                 .enumerate()
                 .all(|(i, power)| self.powers[i] == *power)
             {
-                self.composites_used.push(unit_str.clone());
+                self.composites_used.insert(unit_str.clone());
             }
         }
     }
@@ -437,9 +432,11 @@ impl ops::Add<Unit> for Unit {
                 rhs.powers
             );
         }
-        let mut composites = vec![];
-        composites.append(&mut self.composites_used.clone());
-        composites.append(&mut rhs.composites_used.clone());
+        let composites = self
+            .composites_used
+            .union(&rhs.composites_used)
+            .cloned()
+            .collect();
         Unit::new_composite(self.value + rhs.value, (self.powers, composites))
     }
 }
@@ -453,9 +450,11 @@ impl ops::Sub<Unit> for Unit {
                 rhs.powers
             );
         }
-        let mut composites = vec![];
-        composites.append(&mut self.composites_used.clone());
-        composites.append(&mut rhs.composites_used.clone());
+        let composites = self
+            .composites_used
+            .union(&rhs.composites_used)
+            .cloned()
+            .collect();
         Unit::new_composite(self.value - rhs.value, (self.powers, composites))
     }
 }
@@ -471,9 +470,11 @@ impl ops::Mul<Unit> for Unit {
                 power + rhs.powers[i - 1]
             })
             .collect();
-        let mut composites = vec![];
-        composites.append(&mut self.composites_used.clone());
-        composites.append(&mut rhs.composites_used.clone());
+        let composites = self
+            .composites_used
+            .union(&rhs.composites_used)
+            .cloned()
+            .collect();
         Unit::new_composite_from_vec(self.value * rhs.value, (power_sum, composites))
     }
 }
@@ -489,9 +490,11 @@ impl ops::Div<Unit> for Unit {
                 power - rhs.powers[i - 1]
             })
             .collect();
-        let mut composites = vec![];
-        composites.append(&mut self.composites_used.clone());
-        composites.append(&mut rhs.composites_used.clone());
+        let composites = self
+            .composites_used
+            .union(&rhs.composites_used)
+            .cloned()
+            .collect();
         Unit::new_composite_from_vec(self.value / rhs.value, (power_diff, composites))
     }
 }
