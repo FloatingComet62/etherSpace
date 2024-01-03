@@ -53,6 +53,18 @@ impl Units {
                 "L".to_string(),
                 generate_powers_from_unit_str("m^3".to_string()),
             ),
+            (
+                "W".to_string(),
+                generate_powers_from_unit_str("kgm^2/s^3".to_string()),
+            ),
+            (
+                "Ω".to_string(),
+                generate_powers_from_unit_str("kgm^2/s^3A^2".to_string()),
+            ),
+            (
+                "V".to_string(),
+                generate_powers_from_unit_str("kgm^2/s^3A".to_string()),
+            ),
         ]
     }
 }
@@ -179,60 +191,100 @@ fn generate_powers_from_unit_str(units_str: String) -> [f64; 7] {
     })
 }
 fn generate_unit_str_from_powers_composite(data: ([f64; 7], Vec<String>)) -> String {
-    let mut powers = data.0;
+    let powers = data.0;
     let mut numerator_str = String::new();
     let mut denominator_str = String::new();
-    // TODO PROCEDURE:
-    // Calculate the new power for each composite type, if there was an improvement, use recursively call
-    // this function with the new powers. If there stops being an improvement, then call the non
-    // composite function and concatonate that all the way up the call stack.
-    for (unit_str, composite_unit) in Units::composite().iter() {
-        // if !data.1.contains(unit_str) {
-        //     continue;
-        // }
-        let old_powers = powers.clone();
-        let mut diff_numerator = 0.0;
-        for (i, composite_unit_power) in composite_unit.iter().enumerate() {
-            diff_numerator += (data.0[i] - composite_unit_power).abs();
-        }
-        let mut diff_denominator = 0.0;
-        for (i, composite_unit_power) in composite_unit.iter().enumerate() {
-            diff_denominator += (data.0[i] + composite_unit_power).abs();
-        }
-        let is_numerator = if diff_numerator < diff_denominator {
-            // it is better to use the composite unit in numerator
-            for i in 0..powers.len() {
-                powers[i] -= composite_unit[i]
-            }
-            true
-        } else {
-            for i in 0..powers.len() {
-                powers[i] += composite_unit[i]
-            }
-            false
-        };
 
-        // check if the usage of the unit actually made it better or worse
-        let mut old_sum = 0.0;
-        for old_power in old_powers.iter() {
-            old_sum += old_power.abs();
-        }
-        let mut new_sum = 0.0;
-        for new_power in powers.iter() {
-            new_sum += new_power.abs();
-        }
-        if old_sum < new_sum {
-            // the unit made it worse; undo
-            powers = old_powers.clone();
+    let mut powers_by_composite = vec![];
+    let composites = Units::composite();
+    for (unit_str, composite_unit) in composites
+        .iter()
+        .filter(|(unit_str, _)| data.1.contains(unit_str))
+    {
+        let (diff_numerator, diff_denominator) =
+            composite_unit
+                .iter()
+                .enumerate()
+                .fold((0.0, 0.0), |acc, (i, composite_unit_power)| {
+                    (
+                        acc.0 + (powers[i] - composite_unit_power).abs(),
+                        acc.1 + (powers[i] + composite_unit_power).abs(),
+                    )
+                });
+        if diff_numerator < diff_denominator {
+            powers_by_composite.push((
+                0,
+                (0..powers.len())
+                    .map(|i| powers[i] - composite_unit[i])
+                    .collect::<Vec<f64>>(),
+                unit_str,
+            ));
         } else {
-            if is_numerator {
-                numerator_str += unit_str;
-            } else {
-                denominator_str += unit_str;
-            }
+            powers_by_composite.push((
+                1,
+                (0..powers.len())
+                    .map(|i| powers[i] + composite_unit[i])
+                    .collect::<Vec<f64>>(),
+                unit_str,
+            ));
         }
     }
 
+    // find the best usage
+    let powers_by_composite_score: Vec<f64> = powers_by_composite
+        .iter()
+        .map(|powers_by_composite| {
+            powers_by_composite
+                .1
+                .iter()
+                .fold(0.0, |acc, x| acc + x.abs())
+        })
+        .collect();
+    let mut best_index = -1;
+    let mut best_value = powers.iter().fold(0.0, |acc, x| acc + x.abs());
+    for (i, item) in powers_by_composite_score.iter().enumerate() {
+        if *item <= best_value {
+            best_index = i as isize;
+            best_value = item.clone();
+        }
+    }
+    if best_index != -1 {
+        let best_unit = &powers_by_composite[best_index as usize];
+        let new_powers = best_unit
+            .1
+            .clone()
+            .try_into()
+            .unwrap_or_else(|v: Vec<f64>| {
+                critical!(
+                    "Invalid power length, expected length to by 7, found {}",
+                    v.len()
+                );
+            });
+        let mut new_data = data.1.clone();
+        if best_unit.0 == 0 {
+            // unit goes in numerator
+            numerator_str += &best_unit.2;
+        } else {
+            denominator_str += &best_unit.2;
+        }
+        new_data.push(best_unit.2.clone());
+
+        let normal_unit_str_data = generate_unit_str_from_powers_composite((new_powers, new_data));
+        let normal_unit_str: Vec<&str> = normal_unit_str_data.split('/').collect();
+        if normal_unit_str.len() > 1 {
+            return format!(
+                "{}{}/{}{}",
+                numerator_str, normal_unit_str[0], denominator_str, normal_unit_str[1]
+            );
+        }
+        if denominator_str.len() == 0 {
+            return format!("{}{}", numerator_str, normal_unit_str[0]);
+        }
+        return format!(
+            "{}{}/{}",
+            numerator_str, normal_unit_str[0], denominator_str
+        );
+    }
     let normal_unit_str_data = generate_unit_str_from_powers(powers);
     let normal_unit_str: Vec<&str> = normal_unit_str_data.split('/').collect();
     if normal_unit_str.len() > 1 {
@@ -252,11 +304,12 @@ fn generate_unit_str_from_powers_composite(data: ([f64; 7], Vec<String>)) -> Str
 fn generate_unit_str_from_powers(powers: [f64; 7]) -> String {
     let mut unit_str = String::new();
 
-    for (i, unit) in Units::collection().iter().enumerate() {
+    for (i, unit) in Units::collection()
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| powers[*i] > 0.0)
+    {
         let power = powers[i];
-        if power <= 0.0 {
-            continue;
-        }
         unit_str += &unit.to_string();
         if power == 1.0 {
             continue;
@@ -264,11 +317,12 @@ fn generate_unit_str_from_powers(powers: [f64; 7]) -> String {
         unit_str += &format!("^{}", power.to_string());
     }
     let mut first = true;
-    for (i, unit) in Units::collection().iter().enumerate() {
+    for (i, unit) in Units::collection()
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| powers[*i] < 0.0)
+    {
         let power = powers[i];
-        if power >= 0.0 {
-            continue;
-        }
         if first {
             unit_str += "/";
             first = false;
@@ -301,11 +355,13 @@ pub struct Unit {
 }
 impl Unit {
     pub fn new(value: f64, powers: [f64; 7]) -> Self {
-        Self {
+        let mut unit = Self {
             value,
             powers,
             composites_used: vec![],
-        }
+        };
+        unit.check_for_composite();
+        unit
     }
     pub fn new_int(value: i64, powers: [u8; 7]) -> Self {
         Self::new_from_vec(
@@ -314,7 +370,7 @@ impl Unit {
         )
     }
     pub fn new_from_vec(value: f64, powers: Vec<f64>) -> Self {
-        Self {
+        let mut unit = Self {
             value,
             powers: powers.try_into().unwrap_or_else(|v: Vec<f64>| {
                 critical!(
@@ -323,17 +379,21 @@ impl Unit {
                 );
             }),
             composites_used: vec![],
-        }
+        };
+        unit.check_for_composite();
+        unit
     }
     pub fn new_composite(value: f64, data: ([f64; 7], Vec<String>)) -> Self {
-        Self {
+        let mut unit = Self {
             value,
             powers: data.0,
             composites_used: data.1,
-        }
+        };
+        unit.check_for_composite();
+        unit
     }
     pub fn new_composite_from_vec(value: f64, data: (Vec<f64>, Vec<String>)) -> Self {
-        Self {
+        let mut unit = Self {
             value,
             powers: data.0.try_into().unwrap_or_else(|v: Vec<f64>| {
                 critical!(
@@ -342,13 +402,26 @@ impl Unit {
                 );
             }),
             composites_used: data.1,
+        };
+        unit.check_for_composite();
+        unit
+    }
+    pub fn check_for_composite(&mut self) {
+        for (unit_str, composite_unit) in Units::composite().iter() {
+            if composite_unit
+                .iter()
+                .enumerate()
+                .all(|(i, power)| self.powers[i] == *power)
+            {
+                self.composites_used.push(unit_str.clone());
+            }
         }
     }
 }
 impl Display for Unit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!(
-            "{} {}",
+            "{:.3} {}",
             self.value,
             generate_unit_str_from_powers_composite((self.powers, self.composites_used.clone()))
         ))
@@ -419,7 +492,7 @@ impl ops::Div<Unit> for Unit {
         let mut composites = vec![];
         composites.append(&mut self.composites_used.clone());
         composites.append(&mut rhs.composites_used.clone());
-        Unit::new_composite_from_vec(self.value * rhs.value, (power_diff, composites))
+        Unit::new_composite_from_vec(self.value / rhs.value, (power_diff, composites))
     }
 }
 
