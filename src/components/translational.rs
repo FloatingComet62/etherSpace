@@ -1,6 +1,6 @@
 use crate::{
     modules::{
-        serializer::{serializer, serializer_invec, SerialItem, Serialize},
+        serializer::{SerialItem, Serialize},
         vector::Vector2,
     },
     objects::Object,
@@ -29,9 +29,6 @@ impl Translational {
     pub fn update(&mut self, _object: &mut Object) {}
 }
 impl Serialize for Translational {
-    fn serialize(&self) -> String {
-        self.serialize_nest(0)
-    }
     fn serial_items(&self, _indent: u8) -> Vec<SerialItem> {
         let vec_printer = |vec: &Vector2<f64>| format!("Vector2({}, {})", vec.x, vec.y);
         [
@@ -39,11 +36,5 @@ impl Serialize for Translational {
             SerialItem::new_str("velocity", vec_printer(&self.velocity)),
         ]
         .to_vec()
-    }
-    fn serialize_nest(&self, indent: u8) -> String {
-        serializer(self.serial_items(indent), indent)
-    }
-    fn serialize_invec(&self, indent: u8) -> String {
-        serializer_invec(self.serial_items(indent), indent)
     }
 }

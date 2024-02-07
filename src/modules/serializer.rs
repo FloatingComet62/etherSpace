@@ -62,10 +62,16 @@ fn serializer_invec_option(
 }
 
 pub trait Serialize {
-    fn serialize(&self) -> String;
+    fn serialize(&self) -> String {
+        self.serialize_nest(0)
+    }
     fn serial_items(&self, indent: u8) -> Vec<SerialItem>;
-    fn serialize_nest(&self, indent: u8) -> String;
-    fn serialize_invec(&self, indent: u8) -> String;
+    fn serialize_nest(&self, indent: u8) -> String {
+        serializer(self.serial_items(indent), indent)
+    }
+    fn serialize_invec(&self, indent: u8) -> String {
+        serializer_invec(self.serial_items(indent), indent)
+    }
 }
 
 #[inline]

@@ -3,7 +3,7 @@ use crate::{
     critical,
     modules::{
         log::Log,
-        serializer::{serializer, serializer_invec, serializer_vec_nest, SerialItem, Serialize},
+        serializer::{serializer_vec_nest, SerialItem, Serialize},
     },
     registry::Registry,
 };
@@ -178,9 +178,6 @@ impl Object {
     }
 }
 impl Serialize for Object {
-    fn serialize(&self) -> String {
-        self.serialize_nest(0)
-    }
     fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
         let component_map: Vec<Component>;
         {
@@ -203,11 +200,5 @@ impl Serialize for Object {
             ),
         ]
         .to_vec()
-    }
-    fn serialize_nest(&self, indent: u8) -> String {
-        serializer(self.serial_items(indent), indent)
-    }
-    fn serialize_invec(&self, indent: u8) -> String {
-        serializer_invec(self.serial_items(indent), indent)
     }
 }

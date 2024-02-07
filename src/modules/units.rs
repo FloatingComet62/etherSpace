@@ -35,6 +35,25 @@ impl Units {
         }
         .to_string()
     }
+    pub fn prefix(prefix: Option<char>) -> f64 {
+        match prefix {
+            None => 1.0,
+            Some(p) => match p {
+                'f' => 1e-15, // fermto
+                'p' => 1e-12, // pico
+                'n' => 1e-9,  // nano
+                'μ' => 1e-6,  // micro
+                'c' => 1e-2,  // centi
+                'h' => 1e2,   // hecto
+                'k' => 1e3,   // kilo
+                'M' => 1e6,   // Mega
+                'G' => 1e9,   // Giga
+                'T' => 1e12,  // Tera
+                'P' => 1e15,  // Peta
+                _ => 1.0,
+            },
+        }
+    }
     pub fn composite() -> Vec<(String, [f64; 7])> {
         vec![
             (
@@ -51,7 +70,7 @@ impl Units {
             ),
             (
                 "L".to_string(),
-                generate_powers_from_unit_str("m^3".to_string()),
+                generate_powers_from_unit_str("m^3".to_string()), // BRUH I AM AN IDIOT
             ),
             (
                 "W".to_string(),
@@ -509,5 +528,49 @@ impl ops::Div<f64> for Unit {
     type Output = Unit;
     fn div(self, rhs: f64) -> Self::Output {
         Unit::new_composite(self.value / rhs, (self.powers, self.composites_used))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        modules::units::{generate_powers_from_unit_str_composite, Unit, Units},
+        unit,
+    };
+    #[test]
+    fn force() {
+        let acceleration = unit!(5.0, "m/s^2");
+        let mass = unit!(20.0, "kg");
+        let force = mass * acceleration;
+        for i in 0..7 {
+            assert_eq!(force.powers[i], Units::composite()[0].1[i]);
+        }
+        assert_eq!(force.value, 100.0);
+    }
+    #[test]
+    fn force_from_electric_field() {
+        let electric_field = unit!(25.0, "N/C");
+        let charge = unit!(2.0, "C");
+        let force = electric_field * charge;
+        for i in 0..7 {
+            assert_eq!(force.powers[i], Units::composite()[0].1[i]);
+        }
+        assert_eq!(force.value, 50.0);
+    }
+    #[test]
+    fn power_out_of_nowhere() {
+        let mass = unit!(10.0, "kg");
+        let velocity = unit!(50.0, "m/s");
+        let energy = mass * velocity.clone() * velocity / 2.0;
+        for i in 0..7 {
+            assert_eq!(energy.powers[i], Units::composite()[2].1[i]);
+        }
+        assert_eq!(energy.value, 12500.0);
+
+        let power = energy / unit!(600.0, "s");
+        for i in 0..7 {
+            assert_eq!(power.powers[i], Units::composite()[4].1[i]);
+        }
+        assert_eq!(power.value, 20.833333333333332);
     }
 }

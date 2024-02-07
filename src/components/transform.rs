@@ -1,7 +1,7 @@
 use super::ComponentSignature;
 use crate::{
     modules::{
-        serializer::{serializer, serializer_invec, SerialItem, Serialize},
+        serializer::{SerialItem, Serialize},
         vector::Vector2,
     },
     objects::Object,
@@ -28,9 +28,6 @@ impl Transform {
     pub fn update(&mut self, _object: &mut Object) {}
 }
 impl Serialize for Transform {
-    fn serialize(&self) -> String {
-        self.serialize_nest(0)
-    }
     fn serial_items(&self, _indent: u8) -> Vec<SerialItem> {
         let vec_printer = |vec: &Vector2<f64>| format!("Vector2({}, {})", vec.x, vec.y);
         [
@@ -38,11 +35,5 @@ impl Serialize for Transform {
             SerialItem::new_str("position", vec_printer(&self.position)),
         ]
         .to_vec()
-    }
-    fn serialize_nest(&self, indent: u8) -> String {
-        serializer(self.serial_items(indent), indent)
-    }
-    fn serialize_invec(&self, indent: u8) -> String {
-        serializer_invec(self.serial_items(indent), indent)
     }
 }

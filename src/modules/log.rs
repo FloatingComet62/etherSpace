@@ -9,7 +9,7 @@ impl Log {
     pub fn warn(message: &str) {
         println!("[{}] {}", "Warn".bold().yellow(), message);
     }
-    pub fn critical(message: &str) {
+    pub fn critical(message: &str) -> ! {
         println!("[{}] {}", "Error".bold().red(), message);
         std::process::exit(1);
     }
