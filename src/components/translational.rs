@@ -8,6 +8,10 @@ use crate::{
 
 use super::ComponentSignature;
 
+/// # Translational
+/// * `id` - A unique ID
+/// * `velocity` - Velocity of the object
+/// * `requires` - Components which the component requires
 #[derive(Clone)]
 pub struct Translational {
     pub id: u32,

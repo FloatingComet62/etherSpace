@@ -7,6 +7,10 @@ use crate::{
     objects::Object,
 };
 
+/// # Transform
+/// * `id` - A unique ID
+/// * `position` - Position of the object
+/// * `requires` - Components which the component requires
 #[derive(Clone)]
 pub struct Transform {
     pub id: u32,

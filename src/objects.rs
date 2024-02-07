@@ -79,8 +79,6 @@ fn requirement_sort(vector: &mut Vec<&Component>) {
 /// # Object
 /// * `id` - A unique ID
 /// * `components` - A vector of ID of components
-///
-/// An object is an entity in etherSpace
 #[derive(Clone)]
 pub struct Object {
     pub id: u32,
@@ -88,7 +86,6 @@ pub struct Object {
     registry: Arc<Mutex<Registry>>,
 }
 impl Object {
-    /// Initialize the object
     /// * `id` - ID of the object
     /// * `registry` - The entire registry of etherSpace
     pub fn new(id: u32, registry: Arc<Mutex<Registry>>) -> Self {
@@ -98,7 +95,6 @@ impl Object {
             registry,
         }
     }
-    /// Get a component from the object
     /// * `signature` - Signature of the component to find
     pub fn get_component(&self, signature: ComponentSignature) -> Option<u32> {
         let raw_registry = self.registry.lock();
@@ -114,7 +110,6 @@ impl Object {
         }
         None
     }
-    /// Get the entire vector of components ID
     pub fn get_component_ids(&self) -> &Vec<u32> {
         &self.components
     }
