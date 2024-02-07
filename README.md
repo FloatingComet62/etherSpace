@@ -8,4 +8,4 @@ A Physics engine written in Rust.
 
 ## Architecture
 
-![Architecture](imgs/architecture.png)
+![Architecture](imgs/architecture_v2.png)
