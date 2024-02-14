@@ -2,6 +2,7 @@ use crate::{critical, modules::log::Log};
 use core::fmt::Display;
 use std::{collections::BTreeSet, ops};
 
+const NUM_OF_UNITS: usize = 6;
 pub enum Units {
     Meter,
     Kilogram,
@@ -9,10 +10,10 @@ pub enum Units {
     Ampere,
     Kelvin,
     Mole,
-    Candela,
+    // Candela,
 }
 impl Units {
-    pub fn collection() -> [Units; 7] {
+    pub fn collection() -> [Units; NUM_OF_UNITS] {
         [
             Units::Meter,
             Units::Kilogram,
@@ -20,7 +21,7 @@ impl Units {
             Units::Ampere,
             Units::Kelvin,
             Units::Mole,
-            Units::Candela,
+            // Units::Candela,
         ]
     }
     pub fn to_string(&self) -> String {
@@ -31,7 +32,7 @@ impl Units {
             Units::Ampere => "A",
             Units::Kelvin => "K",
             Units::Mole => "mol",
-            Units::Candela => "cd",
+            // Units::Candela => "cd", // if i ever come to using luminocity in my PHYSICS engine, i have already goofed up
         }
         .to_string()
     }
@@ -43,6 +44,7 @@ impl Units {
                 'p' => 1e-12, // pico
                 'n' => 1e-9,  // nano
                 'μ' => 1e-6,  // micro
+                'd' => 1e-3,  // deci
                 'c' => 1e-2,  // centi
                 'h' => 1e2,   // hecto
                 'k' => 1e3,   // kilo
@@ -54,7 +56,7 @@ impl Units {
             },
         }
     }
-    pub fn composite() -> Vec<(String, [f64; 7])> {
+    pub fn composite() -> Vec<(String, [f64; NUM_OF_UNITS])> {
         vec![
             (
                 "N".to_string(),
@@ -88,11 +90,16 @@ impl Units {
     }
 }
 
-pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], BTreeSet<String>) {
-    let mut powers = vec![0.0; 7];
+// TODO: HANDLE SCALE
+// below this point
+
+pub fn generate_powers_from_unit_str_composite(
+    units_str: String,
+) -> ([f64; NUM_OF_UNITS], BTreeSet<String>, f64) {
+    let mut powers = vec![0.0; NUM_OF_UNITS];
     let mut composite_units_used = BTreeSet::new();
     let slash_index = units_str.find("/").unwrap_or(units_str.len());
-
+    let mut scale = 1.0;
     for (unit_str, composite_unit) in Units::composite().iter() {
         let possibly_index = units_str.find(unit_str.as_str());
         if let None = possibly_index {
@@ -101,6 +108,16 @@ pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], 
         composite_units_used.insert(unit_str.clone());
         let index = possibly_index.unwrap();
         let fraction_coefficient = if slash_index > index { 1.0 } else { -1.0 };
+
+        let prefix_index = index as isize - 1;
+        let prefix_coefficient: f64;
+        if prefix_index > 0 {
+            prefix_coefficient = Units::prefix(units_str.chars().nth(prefix_index as usize));
+        } else {
+            prefix_coefficient = 1.0;
+        }
+        scale *= prefix_coefficient;
+
         let carrot_index = index + unit_str.len();
         let mut chars = units_str.chars();
         let possibly_carrot = chars.nth(carrot_index);
@@ -117,6 +134,7 @@ pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], 
             }
             continue;
         }
+
         let mut digits = String::new();
         let mut sign = 1.0;
         for digit in chars.filter(|digit| *digit != '.') {
@@ -154,12 +172,13 @@ pub fn generate_powers_from_unit_str_composite(units_str: String) -> ([f64; 7], 
             critical!("Impossible");
         }),
         composite_units_used,
+        scale,
     )
 }
-fn generate_powers_from_unit_str(units_str: String) -> [f64; 7] {
-    let mut powers = vec![0.0; 7];
+fn generate_powers_from_unit_str(units_str: String) -> [f64; NUM_OF_UNITS] {
+    let mut powers = vec![0.0; NUM_OF_UNITS];
     let slash_index = units_str.find("/").unwrap_or(units_str.len());
-
+    let mut scale = 1.0;
     for (i, unit) in Units::collection().iter().enumerate() {
         let unit_str = unit.to_string();
         let possibly_index = units_str.find(&unit_str);
@@ -169,6 +188,16 @@ fn generate_powers_from_unit_str(units_str: String) -> [f64; 7] {
         let index = possibly_index.unwrap();
         // allows stuff like "m/s" and "m/s^2"
         let fraction_coefficient = if slash_index > index { 1.0 } else { -1.0 };
+
+        let prefix_index = index as isize - 1;
+        let prefix_coefficient: f64;
+        if prefix_index > 0 {
+            prefix_coefficient = Units::prefix(units_str.chars().nth(prefix_index as usize));
+        } else {
+            prefix_coefficient = 1.0;
+        }
+        scale *= prefix_coefficient;
+
         let carrot_index = index + unit_str.len();
         let mut chars = units_str.chars();
         let possibly_carrot = chars.nth(carrot_index);
@@ -181,6 +210,7 @@ fn generate_powers_from_unit_str(units_str: String) -> [f64; 7] {
             powers[i] = fraction_coefficient;
             continue;
         }
+
         let mut digits = String::new();
         let mut sign = 1.0;
         for digit in chars.filter(|digit| *digit != '.') {
@@ -204,7 +234,9 @@ fn generate_powers_from_unit_str(units_str: String) -> [f64; 7] {
         critical!("Impossible");
     })
 }
-fn generate_unit_str_from_powers_composite(data: ([f64; 7], BTreeSet<String>)) -> String {
+fn generate_unit_str_from_powers_composite(
+    data: ([f64; NUM_OF_UNITS], BTreeSet<String>, f64),
+) -> String {
     let powers = data.0;
     let mut numerator_str = String::new();
     let mut denominator_str = String::new();
@@ -315,7 +347,7 @@ fn generate_unit_str_from_powers_composite(data: ([f64; 7], BTreeSet<String>)) -
         numerator_str, normal_unit_str[0], denominator_str
     )
 }
-fn generate_unit_str_from_powers(powers: [f64; 7]) -> String {
+fn generate_unit_str_from_powers(powers: [f64; NUM_OF_UNITS]) -> String {
     let mut unit_str = String::new();
 
     for (i, unit) in Units::collection()
@@ -364,58 +396,70 @@ macro_rules! unit {
 #[derive(Debug, Clone)]
 pub struct Unit {
     pub value: f64,
-    pub powers: [f64; 7],
+    pub powers: [f64; NUM_OF_UNITS],
     composites_used: BTreeSet<String>,
+    scale: f64,
 }
 impl Unit {
-    pub fn new(value: f64, powers: [f64; 7]) -> Self {
+    pub fn new(value: f64, powers: [f64; NUM_OF_UNITS], scale: f64) -> Self {
         let mut unit = Self {
             value,
             powers,
             composites_used: BTreeSet::new(),
+            scale,
         };
         unit.check_for_composite();
         unit
     }
-    pub fn new_int(value: i64, powers: [u8; 7]) -> Self {
+    pub fn new_int(value: i64, powers: [u8; NUM_OF_UNITS], scale: f64) -> Self {
         Self::new_from_vec(
             value as f64,
             powers.to_vec().into_iter().map(|x| x as f64).collect(),
+            scale,
         )
     }
-    pub fn new_from_vec(value: f64, powers: Vec<f64>) -> Self {
+    pub fn new_from_vec(value: f64, powers: Vec<f64>, scale: f64) -> Self {
         let mut unit = Self {
             value,
             powers: powers.try_into().unwrap_or_else(|v: Vec<f64>| {
                 critical!(
-                    "Invalid power length, expected length to by 7, found {}",
+                    "Invalid power length, expected length to by {}, found {}",
+                    NUM_OF_UNITS,
                     v.len()
                 );
             }),
             composites_used: BTreeSet::new(),
+            scale,
         };
         unit.check_for_composite();
         unit
     }
-    pub fn new_composite(value: f64, data: ([f64; 7], BTreeSet<String>)) -> Self {
+    pub fn new_composite(value: f64, data: ([f64; NUM_OF_UNITS], BTreeSet<String>)) -> Self {
         let mut unit = Self {
             value,
             powers: data.0,
             composites_used: data.1,
+            scale: 1.0,
         };
         unit.check_for_composite();
         unit
     }
-    pub fn new_composite_from_vec(value: f64, data: (Vec<f64>, BTreeSet<String>)) -> Self {
+    pub fn new_composite_from_vec(
+        value: f64,
+        data: (Vec<f64>, BTreeSet<String>),
+        scale: f64,
+    ) -> Self {
         let mut unit = Self {
             value,
             powers: data.0.try_into().unwrap_or_else(|v: Vec<f64>| {
                 critical!(
-                    "Invalid power length, expected length to by 7, found {}",
+                    "Invalid power length, expected length to by {}, found {}",
+                    NUM_OF_UNITS,
                     v.len()
                 );
             }),
             composites_used: data.1,
+            scale,
         };
         unit.check_for_composite();
         unit
@@ -494,7 +538,11 @@ impl ops::Mul<Unit> for Unit {
             .union(&rhs.composites_used)
             .cloned()
             .collect();
-        Unit::new_composite_from_vec(self.value * rhs.value, (power_sum, composites))
+        Unit::new_composite_from_vec(
+            self.value * rhs.value * self.scale / rhs.scale,
+            (power_sum, composites),
+            self.scale,
+        )
     }
 }
 impl ops::Div<Unit> for Unit {
@@ -514,7 +562,11 @@ impl ops::Div<Unit> for Unit {
             .union(&rhs.composites_used)
             .cloned()
             .collect();
-        Unit::new_composite_from_vec(self.value / rhs.value, (power_diff, composites))
+        Unit::new_composite_from_vec(
+            self.value * rhs.scale / rhs.value * self.scale,
+            (power_diff, composites),
+            self.scale,
+        )
     }
 }
 
