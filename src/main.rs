@@ -1,6 +1,7 @@
 use ether_space::{
+    unit,
     info,
-    modules::{log::Log, serializer::Serialize},
+    modules::{log::Log, units::{generate_powers_from_unit_str_composite, Unit}},
     registry::Registry,
     world::World,
 };
@@ -22,9 +23,11 @@ fn main() {
     info!("Exiting");
 }
 
+#[allow(dead_code)]
 struct EtherSpaceEngine {
     pub world: World,
 }
+#[allow(dead_code)]
 impl EtherSpaceEngine {
     pub fn new(registry: Arc<Mutex<Registry>>) -> Self {
         Self {
