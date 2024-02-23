@@ -1,8 +1,5 @@
 use crate::{
-    modules::{
-        serializer::{SerialItem, Serialize},
-        vector::Vector2,
-    },
+    modules::vector::Vector2,
     objects::Object,
 };
 
@@ -31,14 +28,4 @@ impl Translational {
     }
     pub fn start(&mut self, _object: &mut Object) {}
     pub fn update(&mut self, _object: &mut Object) {}
-}
-impl Serialize for Translational {
-    fn serial_items(&self, _indent: u8) -> Vec<SerialItem> {
-        let vec_printer = |vec: &Vector2<f64>| format!("Vector2({}, {})", vec.x, vec.y);
-        [
-            SerialItem::new_str("id", self.id.to_string()),
-            SerialItem::new_str("velocity", vec_printer(&self.velocity)),
-        ]
-        .to_vec()
-    }
 }

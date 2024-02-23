@@ -2,10 +2,8 @@ use crate::{
     critical,
     modules::{
         log::Log,
-        serializer::{serializer_vec_nest, SerialItem, Serialize},
         vector::Vector2,
     },
-    objects::Object,
     registry::Registry,
 };
 use std::sync::{Arc, Mutex};
@@ -15,8 +13,8 @@ use std::sync::{Arc, Mutex};
 /// * `gravity` - Global gravity
 pub struct World {
     pub id: u32,
-    objects: Vec<u32>,
-    registry: Arc<Mutex<Registry>>,
+    pub objects: Vec<u32>,
+    pub registry: Arc<Mutex<Registry>>,
     pub gravity: f32,
 }
 impl World {
@@ -42,28 +40,5 @@ impl World {
     }
     pub fn load_from_file() -> Self {
         critical!("Todo");
-    }
-}
-
-impl Serialize for World {
-    fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
-        let object_map: Vec<Object>;
-        {
-            let raw_registry = self.registry.lock();
-            if raw_registry.is_err() {
-                critical!("Registry is locked");
-            }
-            let registry = raw_registry.unwrap();
-            object_map = self
-                .objects
-                .iter()
-                .map(|obj_id| (*registry.get_object(*obj_id)).clone())
-                .collect();
-        }
-        [
-            SerialItem::new_str("id", self.id.to_string()),
-            SerialItem::new_str("objects", serializer_vec_nest(&object_map, indent + 1)),
-        ]
-        .to_vec()
     }
 }

@@ -1,10 +1,7 @@
 use crate::{
     components::{Component, ComponentSignature},
     critical,
-    modules::{
-        log::Log,
-        serializer::{serializer_vec_nest, SerialItem, Serialize},
-    },
+    modules::log::Log,
     registry::Registry,
 };
 use std::sync::{Arc, Mutex};
@@ -18,7 +15,7 @@ fn convert_signature_to_index(
             return Some(i);
         }
     }
-    return None;
+    None
 }
 fn trace_dependencies(
     root: &Vec<&Component>,
@@ -48,7 +45,7 @@ fn trace_dependencies(
             new_sort.push(required_node.signature());
         }
     }
-    return new_sort;
+    new_sort
 }
 fn requirement_sort(vector: &mut Vec<&Component>) {
     let mut new_sort = vec![];
@@ -82,8 +79,8 @@ fn requirement_sort(vector: &mut Vec<&Component>) {
 #[derive(Clone)]
 pub struct Object {
     pub id: u32,
-    components: Vec<u32>,
-    registry: Arc<Mutex<Registry>>,
+    pub components: Vec<u32>,
+    pub registry: Arc<Mutex<Registry>>,
 }
 impl Object {
     /// * `id` - ID of the object
@@ -135,7 +132,7 @@ impl Object {
             }
         }
         self.components.push(component_id);
-        return Some(());
+        Some(())
     }
     pub fn start(&mut self) {
         // Sort the components vector according to the requirements
@@ -170,30 +167,5 @@ impl Object {
             let component = registry.get_component_mut(*component_id);
             component.update(&mut self.clone());
         }
-    }
-}
-impl Serialize for Object {
-    fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
-        let component_map: Vec<Component>;
-        {
-            let raw_registry = self.registry.lock();
-            if raw_registry.is_err() {
-                critical!("Registry is locked");
-            }
-            let registry = raw_registry.unwrap();
-            component_map = self
-                .components
-                .iter()
-                .map(|comp_id| (*registry.get_component(*comp_id)).clone())
-                .collect();
-        }
-        [
-            SerialItem::new_str("id", self.id.to_string()),
-            SerialItem::new_str(
-                "components",
-                serializer_vec_nest(&component_map, indent + 1),
-            ),
-        ]
-        .to_vec()
     }
 }

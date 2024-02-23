@@ -65,9 +65,16 @@ pub trait Serialize {
     fn serialize(&self) -> String {
         self.serialize_nest(0)
     }
+    fn serialize_reg(&self, registry: Registry) -> String {
+        self.serialize_nest_reg(0, registry)
+    }
     fn serial_items(&self, indent: u8) -> Vec<SerialItem>;
+    fn serial_items_reg(&self, indent: u8, registry: Registry) -> Vec<SerialItem>;
     fn serialize_nest(&self, indent: u8) -> String {
         serializer(self.serial_items(indent), indent)
+    }
+    fn serialize_nest_reg(&self, indent: u8, registry: Registry) -> String {
+        serializer(self.serial_items_reg(indent, registry), indent)
     }
     fn serialize_invec(&self, indent: u8) -> String {
         serializer_invec(self.serial_items(indent), indent)
@@ -101,4 +108,149 @@ fn serializer_vec_nest_option(vec: &Vec<impl Serialize>, indent: u8) -> String {
     }
 
     str
+}
+
+use crate::{components::{transform::Transform, translational::Translational, Component}, critical, modules::{log::Log, vector::Vector2}, objects::Object, registry::Registry, world::World};
+impl Serialize for World {
+    fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
+        let object_map: Vec<Object>;
+        {
+            let raw_registry = self.registry.lock();
+            if raw_registry.is_err() {
+                critical!("Registry is locked");
+            }
+            let registry = raw_registry.unwrap();
+            object_map = self
+                .objects
+                .iter()
+                .map(|obj_id| (*registry.get_object(*obj_id)).clone())
+                .collect();
+        }
+        [
+            SerialItem::new_str("id", self.id.to_string()),
+            SerialItem::new_str("objects", serializer_vec_nest(&object_map, indent + 1)),
+        ]
+        .to_vec()
+    }
+    fn serial_items_reg(&self, indent: u8, registry: Registry) -> Vec<SerialItem> {
+        let object_map = self
+                .objects
+                .iter()
+                .map(|obj_id| (*registry.get_object(*obj_id)).clone())
+                .collect();
+        [
+            SerialItem::new_str("id", self.id.to_string()),
+            SerialItem::new_str("objects", serializer_vec_nest(&object_map, indent + 1)),
+        ]
+        .to_vec()
+    }
+}
+impl Serialize for Object {
+    fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
+        let component_map: Vec<Component>;
+        {
+            let raw_registry = self.registry.lock();
+            if raw_registry.is_err() {
+                critical!("Registry is locked");
+            }
+            let registry = raw_registry.unwrap();
+            component_map = self
+                .components
+                .iter()
+                .map(|comp_id| (*registry.get_component(*comp_id)).clone())
+                .collect();
+        }
+        [
+            SerialItem::new_str("id", self.id.to_string()),
+            SerialItem::new_str(
+                "components",
+                serializer_vec_nest(&component_map, indent + 1),
+            ),
+        ]
+        .to_vec()
+    }
+    fn serial_items_reg(&self, indent: u8, registry: Registry) -> Vec<SerialItem> {
+        let component_map = self
+                .components
+                .iter()
+                .map(|comp_id| (*registry.get_component(*comp_id)).clone())
+                .collect();
+        [
+            SerialItem::new_str("id", self.id.to_string()),
+            SerialItem::new_str(
+                "components",
+                serializer_vec_nest(&component_map, indent + 1),
+            ),
+        ]
+        .to_vec()
+    }
+}
+impl Serialize for Component {
+    fn serialize(&self) -> String {
+        match &self {
+            Component::Transform(component) => component.serialize(),
+            Component::Translational(component) => component.serialize(),
+        }
+    }
+
+    fn serial_items(&self, indent: u8) -> Vec<SerialItem> {
+        match &self {
+            Component::Transform(component) => component.serial_items(indent),
+            Component::Translational(component) => component.serial_items(indent),
+        }
+    }
+
+    fn serialize_nest(&self, indent: u8) -> String {
+        match &self {
+            Component::Transform(component) => component.serialize_nest(indent),
+            Component::Translational(component) => component.serialize_nest(indent),
+        }
+    }
+
+    fn serialize_invec(&self, indent: u8) -> String {
+        match &self {
+            Component::Transform(component) => component.serialize_invec(indent),
+            Component::Translational(component) => component.serialize_invec(indent),
+        }
+    }
+    fn serial_items_reg(&self, indent: u8, registry: Registry) -> Vec<SerialItem> {
+        match &self {
+            Component::Transform(component) => component.serial_items_reg(indent, registry),
+            Component::Translational(component) => component.serial_items_reg(indent, registry),
+        }
+    }
+}
+impl Serialize for Transform {
+    fn serial_items(&self, _indent: u8) -> Vec<SerialItem> {
+        let vec_printer = |vec: &Vector2<f64>| format!("Vector2({}, {})", vec.x, vec.y);
+        [
+            SerialItem::new_str("id", self.id.to_string()),
+            SerialItem::new_str("position", vec_printer(&self.position)),
+        ]
+        .to_vec()
+    }
+    fn serial_items_reg(&self, indent: u8, _registry: Registry) -> Vec<SerialItem> {
+        self.serial_items(indent)
+    }
+}
+impl Serialize for Translational {
+    fn serial_items(&self, _indent: u8) -> Vec<SerialItem> {
+        let vec_printer = |vec: &Vector2<f64>| format!("Vector2({}, {})", vec.x, vec.y);
+        [
+            SerialItem::new_str("id", self.id.to_string()),
+            SerialItem::new_str("velocity", vec_printer(&self.velocity)),
+        ]
+        .to_vec()
+    }
+    fn serial_items_reg(&self, indent: u8, _registry: Registry) -> Vec<SerialItem> {
+        self.serial_items(indent)
+    }
+}
+impl Serialize for u32 {
+    fn serial_items(&self, _indent: u8) -> Vec<SerialItem> {
+        [SerialItem::new_str("value", self.to_string())].to_vec()
+    }
+    fn serial_items_reg(&self, indent: u8, _registry: Registry) -> Vec<SerialItem> {
+        self.serial_items(indent)
+    }
 }
