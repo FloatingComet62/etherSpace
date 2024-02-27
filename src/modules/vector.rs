@@ -1,17 +1,23 @@
-#[derive(Clone)]
+use core::str::FromStr;
+use serde::{Serialize, Deserialize};
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Vector2<T>
 where
-    T: Default,
+    T: Default + ToString + FromStr,
 {
     pub x: T,
     pub y: T,
 }
 
-impl<T: Default> Vector2<T> {
+impl<T: Default + std::fmt::Display + FromStr> Vector2<T> {
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
-    pub fn default() -> Self {
+}
+
+impl<T: Default + std::fmt::Display + FromStr> Default for Vector2<T> {
+    fn default() -> Self {
         Self {
             x: T::default(),
             y: T::default(),

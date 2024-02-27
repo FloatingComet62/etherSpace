@@ -1,11 +1,12 @@
 use self::{component_registry::ComponentRegistry, object_registry::ObjectRegistry};
 use crate::{components::Component, modules::vector::Vector2, objects::Object};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
+use serde::{Serialize, Deserialize};
 
 pub mod component_registry;
 pub mod object_registry;
 
-#[derive(Clone)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct Registry {
     component: ComponentRegistry,
     object: ObjectRegistry,
@@ -44,5 +45,14 @@ impl Registry {
     #[inline]
     pub fn get_object(&self, object_id: u32) -> &Object {
         self.object.get_object(object_id)
+    }
+}
+
+pub struct Wrapper<'a>(pub MutexGuard<'a, Registry>);
+impl<'a> Serialize for Wrapper<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer {
+        self.0.serialize(serializer)
     }
 }

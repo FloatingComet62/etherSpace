@@ -1,7 +1,7 @@
 use ether_space::{
     info,
-    modules::{log::Log, serializer::Serialize},
-    registry::Registry,
+    modules::log::Log,
+    registry::{Registry, Wrapper},
     world::World,
 };
 /// Note that using Mutex introduces potential for contention (threads waiting for the lock) which
@@ -17,7 +17,10 @@ fn main() {
     let mut window = EtherSpaceEngine::new(registry);
     window.world.create_object();
     window.world.create_object();
-    println!("{}", window.world.serialize());
+    println!("{}", serde_yaml::to_string(&window.world).unwrap());
+    let binding = window.world.registry.unwrap();
+    let reg = Wrapper(binding.lock().unwrap());
+    println!("{}", serde_yaml::to_string(&reg).unwrap());
 
     info!("Exiting");
 }

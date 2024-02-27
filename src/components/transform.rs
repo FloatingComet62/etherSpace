@@ -3,12 +3,13 @@ use crate::{
     modules::vector::Vector2,
     objects::Object,
 };
+use serde::{Serialize, Deserialize};
 
 /// # Transform
 /// * `id` - A unique ID
 /// * `position` - Position of the object
 /// * `requires` - Components which the component requires
-#[derive(Clone)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct Transform {
     pub id: u32,
     pub position: Vector2<f64>,

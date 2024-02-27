@@ -1,8 +1,9 @@
 use super::Registry;
 use crate::objects::Object;
 use std::sync::{Arc, Mutex};
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct ObjectRegistry {
     objects: Vec<Object>,
 }

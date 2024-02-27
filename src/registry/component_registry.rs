@@ -2,8 +2,9 @@ use crate::{
     components::{transform::Transform, translational::Translational, Component},
     modules::vector::Vector2,
 };
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct ComponentRegistry {
     component: Vec<Component>,
 }

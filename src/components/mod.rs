@@ -1,10 +1,11 @@
 use crate::objects::Object;
 use std::fmt::{Debug, Display};
+use serde::{Serialize, Deserialize};
 
 pub mod transform;
 pub mod translational;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub enum Component {
     Transform(transform::Transform),
     Translational(translational::Translational),
@@ -42,7 +43,7 @@ impl Component {
     }
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Serialize, Deserialize)]
 pub enum ComponentSignature {
     Transform,
     TranslationalPhysics,
