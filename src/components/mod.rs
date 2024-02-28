@@ -23,7 +23,7 @@ impl Component {
             Component::Translational(component) => component.start(object),
         }
     }
-    pub fn update(&mut self, object: &mut Object) {
+    pub fn update(&mut self, object: &&mut Object) {
         match self {
             Component::Transform(component) => component.update(object),
             Component::Translational(component) => component.update(object),

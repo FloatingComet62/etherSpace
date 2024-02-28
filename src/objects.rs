@@ -4,7 +4,7 @@ use crate::{
     modules::log::Log,
     registry::Registry,
 };
-use std::{fmt, sync::{Arc, Mutex}};
+use std::fmt;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, de::{self, Visitor, SeqAccess, MapAccess}};
 
 fn convert_signature_to_index(
@@ -81,42 +81,24 @@ fn requirement_sort(vector: &mut Vec<&Component>) {
 pub struct Object {
     pub id: u32,
     pub components: Vec<u32>,
-    pub registry: Option<Arc<Mutex<Registry>>>,
 }
 impl Object {
     /// * `id` - ID of the object
     /// * `registry` - The entire registry of etherSpace
-    pub fn new(id: u32, registry: Arc<Mutex<Registry>>) -> Self {
+    pub fn new(id: u32) -> Self {
         Self {
             id,
             components: Vec::new(),
-            registry: Some(registry),
-        }
-    }
-    /// * `id` - ID of the world
-    /// registry is initialized to None
-    pub fn new_noreg(id: u32) -> Self {
-        Self {
-            id,
-            components: Vec::new(),
-            registry: None,
         }
     }
     pub fn new_from_yaml(id: u32, components: Vec<u32>) -> Self {
         Self {
             id, 
             components,
-            registry: None
         }
     }
     /// * `signature` - Signature of the component to find
-    pub fn get_component(&self, signature: ComponentSignature) -> Option<u32> {
-        let binding = self.registry.clone()?;
-        let raw_registry = binding.lock();
-        if raw_registry.is_err() {
-            critical!("Registry is locked");
-        }
-        let registry = raw_registry.unwrap();
+    pub fn get_component(&self, signature: ComponentSignature, registry: &Registry) -> Option<u32> {
         for component_id in self.components.iter() {
             let component = registry.get_component(*component_id);
             if component.signature() == signature {
@@ -133,34 +115,20 @@ impl Object {
     }
     /// Add a component to the object
     /// * `component_id` - Component ID of the component to add
-    pub fn add_component(&mut self, component_id: u32) -> Option<()> {
-        {
-            let binding = self.registry.clone()?;
-            let raw_registry = binding.lock();
-            if raw_registry.is_err() {
-                critical!("Registry is locked");
-            }
-            let registry = raw_registry.unwrap();
-            let component = registry.get_component(component_id);
-            if self.get_component(component.signature()).is_some() {
-                critical!(
-                    "Cannot add the same component twice ({:?}) to object ({:})",
-                    component.signature(),
-                    self.id
-                );
-            }
+    pub fn add_component(&mut self, component_id: u32, registry: &mut Registry) -> Option<()> {
+        let component = registry.get_component(component_id);
+        if self.get_component(component.signature(), registry).is_some() {
+            critical!(
+                "Cannot add the same component twice ({:?}) to object ({:})",
+                component.signature(),
+                self.id
+            );
         }
         self.components.push(component_id);
         Some(())
     }
-    pub fn start(&mut self) -> Option<()> {
+    pub fn start(&mut self, registry: &mut Registry) -> Option<()> {
         // Sort the components vector according to the requirements
-        let binding = self.registry.clone()?;
-        let raw_registry = binding.lock();
-        if raw_registry.is_err() {
-            critical!("Registry is locked");
-        }
-        let mut registry = raw_registry.unwrap();
         let mut binding = self
             .components
             .iter()
@@ -177,19 +145,10 @@ impl Object {
         }
         Some(())
     }
-    pub fn update(&mut self) -> Option<()> {
-        // PROBABLY NOT CLONE HERE
-        let binding = self.registry.clone()?;
-        let raw_registry = binding.lock();
-        if raw_registry.is_err() {
-            critical!("Registry is locked");
-        }
-        let mut registry = raw_registry.unwrap();
-
+    pub fn update(&mut self, registry: &mut Registry) -> Option<()> {
         for component_id in self.components.iter() {
             let component = registry.get_component_mut(*component_id);
-            // AND HERE
-            component.update(&mut self.clone());
+            component.update(&self);
         }
         Some(())
     }

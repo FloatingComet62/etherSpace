@@ -1,6 +1,4 @@
-use super::Registry;
 use crate::objects::Object;
-use std::sync::{Arc, Mutex};
 use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Default, Serialize, Deserialize)]
@@ -12,9 +10,9 @@ impl ObjectRegistry {
         Self { objects: vec![] }
     }
     #[inline]
-    pub fn create_object(&mut self, registry: Arc<Mutex<Registry>>) -> u32 {
+    pub fn create_object(&mut self) -> u32 {
         let id = self.objects.len() as u32;
-        self.objects.push(Object::new(id, registry));
+        self.objects.push(Object::new(id));
         id
     }
     #[inline]

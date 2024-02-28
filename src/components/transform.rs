@@ -27,5 +27,5 @@ impl Transform {
         self.requires.clone()
     }
     pub fn start(&mut self, _object: &mut Object) {}
-    pub fn update(&mut self, _object: &mut Object) {}
+    pub fn update(&mut self, _object: &&mut Object) {}
 }

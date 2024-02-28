@@ -1,6 +1,5 @@
 use self::{component_registry::ComponentRegistry, object_registry::ObjectRegistry};
 use crate::{components::Component, modules::vector::Vector2, objects::Object};
-use std::sync::{Arc, Mutex, MutexGuard};
 use serde::{Serialize, Deserialize};
 
 pub mod component_registry;
@@ -35,8 +34,8 @@ impl Registry {
         self.component.get_component_mut(component_id)
     }
     #[inline]
-    pub fn create_object(&mut self, reference: Arc<Mutex<Registry>>) -> u32 {
-        self.object.create_object(Arc::clone(&reference))
+    pub fn create_object(&mut self) -> u32 {
+        self.object.create_object()
     }
     #[inline]
     pub fn add_component(&mut self, object_id: u32, component_id: u32) {
@@ -45,14 +44,5 @@ impl Registry {
     #[inline]
     pub fn get_object(&self, object_id: u32) -> &Object {
         self.object.get_object(object_id)
-    }
-}
-
-pub struct Wrapper<'a>(pub MutexGuard<'a, Registry>);
-impl<'a> Serialize for Wrapper<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: serde::Serializer {
-        self.0.serialize(serializer)
     }
 }

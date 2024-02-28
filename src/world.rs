@@ -1,28 +1,24 @@
 use crate::{
-    critical,
-    modules::{
-        log::Log,
-        vector::Vector2,
-    },
+    modules::vector::Vector2,
     registry::Registry,
 };
-use std::{fmt, sync::{Arc, Mutex}};
+use std::fmt;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, de::{self, Visitor, SeqAccess, MapAccess}};
 
 /// # World
 /// * `id` - A unique id
 /// * `gravity` - Global gravity
 #[derive(Default)]
-pub struct World {
+pub struct World<'a> {
     pub id: u32,
     pub objects: Vec<u32>,
-    pub registry: Option<Arc<Mutex<Registry>>>,
+    pub registry: Option<&'a mut Registry>,
     pub gravity: f32,
 }
-impl World {
+impl<'a> World<'a> {
     /// * `id` - ID of the world
     /// * `registry` - The entire registry of etherSpace
-    pub fn new(id: u32, registry: Arc<Mutex<Registry>>) -> Self {
+    pub fn new(id: u32, registry: &'a mut Registry) -> Self {
         Self {
             id,
             objects: Vec::new(),
@@ -48,29 +44,23 @@ impl World {
             registry: None,
         }
     }
-    pub fn add_registry(&mut self, registry: Registry) -> Option<()> {
+    pub fn add_registry(&mut self, registry: &'a mut Registry) -> Option<()> {
         if self.registry.is_some() {
             return None;
         }
-        self.registry = Some(Arc::new(Mutex::new(registry)));
+        self.registry = Some(registry);
         Some(())
     }
-    pub fn create_object(&mut self) -> Option<u32> {
-        // PROBABLY NOT CLONE HERE
-        let binding = self.registry.clone()?;
-        let mut registry = binding.lock().ok()?;
-        let id = registry.create_object(Arc::clone(&binding));
+    pub fn create_object(&mut self, registry: &'a mut Registry) -> Option<u32> {
+        let id = registry.create_object();
         self.objects.push(id);
 
         let comp_id = registry.create_transform(Vector2::default());
         registry.add_component(id, comp_id);
         Some(id)
     }
-    pub fn load_from_file() -> Self {
-        critical!("Todo");
-    }
 }
-impl Serialize for World {
+impl<'a> Serialize for World<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where
             S: serde::Serializer {
@@ -81,7 +71,7 @@ impl Serialize for World {
         state.end()
     }
 }
-impl<'de> Deserialize<'de> for World {
+impl<'de> Deserialize<'de> for World<'de> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where
             D: serde::Deserializer<'de> {
@@ -92,13 +82,13 @@ impl<'de> Deserialize<'de> for World {
 
         struct WorldVisitor;
         impl<'de> Visitor<'de> for WorldVisitor {
-            type Value = World;
+            type Value = World<'de>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 formatter.write_str("struct World")
             }
 
-            fn visit_seq<V>(self, mut seq: V) -> Result<World, V::Error>
+            fn visit_seq<V>(self, mut seq: V) -> Result<World<'de>, V::Error>
             where
                 V: SeqAccess<'de>,
             {
@@ -111,7 +101,7 @@ impl<'de> Deserialize<'de> for World {
                 Ok(World::new_from_yaml(id, objects, gravity))
             }
 
-            fn visit_map<V>(self, mut map: V) -> Result<World, V::Error>
+            fn visit_map<V>(self, mut map: V) -> Result<World<'de>, V::Error>
             where
                 V: MapAccess<'de>,
             {
