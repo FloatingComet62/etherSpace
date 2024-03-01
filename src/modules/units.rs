@@ -53,7 +53,11 @@ impl Units {
         ]
     }
     pub fn prefix(possibly_prefix: Option<char>) -> f64 {
-        let prefix = if let Some(c) = possibly_prefix { c } else { return 1.0; };
+        let prefix = if let Some(c) = possibly_prefix {
+            c
+        } else {
+            return 1.0;
+        };
         for (c, f) in Units::prefix_data().into_iter() {
             if prefix == c {
                 return f;
@@ -111,17 +115,25 @@ pub fn generate_powers_from_unit_str_composite(
     let slash_index = units_str.find("/").unwrap_or(units_str.len());
     let mut scale = 1.0;
     for (unit_str, composite_unit) in Units::composite().iter() {
-        let index = if let Some(i) = units_str.find(unit_str.as_str()) { i } else { continue; };
+        let index = if let Some(i) = units_str.find(unit_str.as_str()) {
+            i
+        } else {
+            continue;
+        };
         composite_units_used.insert(unit_str.clone());
         let fraction_coefficient = if slash_index > index { 1.0 } else { -1.0 };
 
-        let prefix_coefficient = if index == 0 { 1.0 } else {
+        let prefix_coefficient = if index == 0 {
+            1.0
+        } else {
             Units::prefix(units_str.chars().nth(index - 1))
         };
         scale *= prefix_coefficient;
 
         let mut chars = units_str.chars();
-        let carrot = if let Some(x) = chars.nth(index + unit_str.len()) { x } else {
+        let carrot = if let Some(x) = chars.nth(index + unit_str.len()) {
+            x
+        } else {
             for i in 0..powers.len() {
                 powers[i] += composite_unit.0[i] * fraction_coefficient;
             }
@@ -172,7 +184,7 @@ pub fn generate_powers_from_unit_str_composite(
 
     (
         powers.try_into().unwrap_or_else(|_| {
-            critical!("Impossible");
+            critical!("reached unreachable");
         }),
         composite_units_used,
         scale * data.1,
@@ -184,18 +196,26 @@ fn generate_powers_from_unit_str(units_str: String) -> ([f64; NUM_OF_UNITS], f64
     let mut scale = 1.0;
     for (i, unit) in Units::collection().iter().enumerate() {
         let unit_str = unit.to_string();
-        let index = if let Some(i) = units_str.find(&unit_str) { i } else { continue; };
+        let index = if let Some(i) = units_str.find(&unit_str) {
+            i
+        } else {
+            continue;
+        };
         // allows stuff like "m/s" and "m/s^2"
         let fraction_coefficient = if slash_index > index { 1.0 } else { -1.0 };
 
         let prefix_index = index as isize - 1;
-        let prefix_coefficient: f64 = if index == 0 { 1.0 } else {
+        let prefix_coefficient: f64 = if index == 0 {
+            1.0
+        } else {
             Units::prefix(units_str.chars().nth(prefix_index as usize))
         };
         scale *= prefix_coefficient;
 
         let mut chars = units_str.chars();
-        let carrot = if let Some(x) = chars.nth(index + unit_str.len()) { x } else {
+        let carrot = if let Some(x) = chars.nth(index + unit_str.len()) {
+            x
+        } else {
             powers[i] = fraction_coefficient;
             continue;
         };
@@ -222,9 +242,12 @@ fn generate_powers_from_unit_str(units_str: String) -> ([f64; NUM_OF_UNITS], f64
         }
     }
 
-    (powers.try_into().unwrap_or_else(|_| {
-        critical!("Impossible");
-    }), scale)
+    (
+        powers.try_into().unwrap_or_else(|_| {
+            critical!("reached unreachable");
+        }),
+        scale,
+    )
 }
 fn generate_unit_str_from_powers_composite(
     data: ([f64; NUM_OF_UNITS], BTreeSet<String>, f64),
@@ -238,16 +261,15 @@ fn generate_unit_str_from_powers_composite(
         .into_iter()
         .filter(|(unit_str, _)| data.1.contains(unit_str))
     {
-        let (diff_numerator, diff_denominator) =
-            composite_unit.0
-                .iter()
-                .enumerate()
-                .fold((0.0, 0.0), |acc, (i, composite_unit_power)| {
-                    (
-                        acc.0 + (powers[i] - composite_unit_power).abs(),
-                        acc.1 + (powers[i] + composite_unit_power).abs(),
-                    )
-                });
+        let (diff_numerator, diff_denominator) = composite_unit.0.iter().enumerate().fold(
+            (0.0, 0.0),
+            |acc, (i, composite_unit_power)| {
+                (
+                    acc.0 + (powers[i] - composite_unit_power).abs(),
+                    acc.1 + (powers[i] + composite_unit_power).abs(),
+                )
+            },
+        );
         let binding;
         let sign;
 
@@ -264,7 +286,7 @@ fn generate_unit_str_from_powers_composite(
                 .map(|i| powers[i] + sign * composite_unit.0[i])
                 .collect::<Vec<f64>>(),
             unit_str,
-            composite_unit.1
+            composite_unit.1,
         ));
     }
 
@@ -278,7 +300,9 @@ fn generate_unit_str_from_powers_composite(
                 .1
                 .iter()
                 .fold(0.0, |acc, x| acc + x.abs())
-        }).enumerate() {
+        })
+        .enumerate()
+    {
         if item <= best_value {
             best_index = i as isize;
             best_value = item.clone();
@@ -308,21 +332,34 @@ fn generate_unit_str_from_powers_composite(
             new_scale *= best_unit.3;
         }
         new_data.insert(best_unit.2.clone());
-        let (normal_unit_str_data, scale, prefix) = generate_unit_str_from_powers_composite((new_powers, new_data, new_scale));
+        let (normal_unit_str_data, scale, prefix) =
+            generate_unit_str_from_powers_composite((new_powers, new_data, new_scale));
         let normal_unit_str: Vec<&str> = normal_unit_str_data.split('/').collect();
         if normal_unit_str.len() > 1 {
-            return (format!(
-                "{}{}{}/{}{}",
-                prefix, numerator_str, normal_unit_str[0], denominator_str, normal_unit_str[1]
-            ), scale, prefix);
+            return (
+                format!(
+                    "{}{}{}/{}{}",
+                    prefix, numerator_str, normal_unit_str[0], denominator_str, normal_unit_str[1]
+                ),
+                scale,
+                prefix,
+            );
         }
         if denominator_str.len() == 0 {
-            return (format!("{}{}{}", prefix, numerator_str, normal_unit_str[0]), scale, prefix);
+            return (
+                format!("{}{}{}", prefix, numerator_str, normal_unit_str[0]),
+                scale,
+                prefix,
+            );
         }
-        return (format!(
-            "{}{}{}/{}",
-            prefix, numerator_str, normal_unit_str[0], denominator_str
-        ), scale, prefix);
+        return (
+            format!(
+                "{}{}{}/{}",
+                prefix, numerator_str, normal_unit_str[0], denominator_str
+            ),
+            scale,
+            prefix,
+        );
     }
 
     let new_scale;
@@ -338,18 +375,30 @@ fn generate_unit_str_from_powers_composite(
     let normal_unit_str_data = generate_unit_str_from_powers(powers);
     let normal_unit_str: Vec<&str> = normal_unit_str_data.split('/').collect();
     if normal_unit_str.len() > 1 {
-        return (format!(
-            "{}{}/{}{}",
-            numerator_str, normal_unit_str[0], denominator_str, normal_unit_str[1]
-        ), new_scale, new_prefix);
+        return (
+            format!(
+                "{}{}/{}{}",
+                numerator_str, normal_unit_str[0], denominator_str, normal_unit_str[1]
+            ),
+            new_scale,
+            new_prefix,
+        );
     }
     if denominator_str.len() == 0 {
-        return (format!("{}{}", numerator_str, normal_unit_str[0]), new_scale, new_prefix);
+        return (
+            format!("{}{}", numerator_str, normal_unit_str[0]),
+            new_scale,
+            new_prefix,
+        );
     }
-    (format!(
-        "{}{}/{}",
-        numerator_str, normal_unit_str[0], denominator_str
-    ), new_scale, new_prefix)
+    (
+        format!(
+            "{}{}/{}",
+            numerator_str, normal_unit_str[0], denominator_str
+        ),
+        new_scale,
+        new_prefix,
+    )
 }
 fn generate_unit_str_from_powers(powers: [f64; NUM_OF_UNITS]) -> String {
     let mut unit_str = String::new();
@@ -470,7 +519,8 @@ impl Unit {
     }
     pub fn check_for_composite(&mut self) {
         for (unit_str, composite_unit) in Units::composite().iter() {
-            if composite_unit.0
+            if composite_unit
+                .0
                 .iter()
                 .enumerate()
                 .all(|(i, power)| self.powers[i] == *power)
@@ -490,12 +540,12 @@ impl PartialEq for Unit {
 }
 impl Display for Unit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let data = generate_unit_str_from_powers_composite((self.powers, self.composites_used.clone(), self.scale));
-        f.write_fmt(format_args!(
-            "{:.3} {}",
-            self.value * data.1,
-            data.0
-        ))
+        let data = generate_unit_str_from_powers_composite((
+            self.powers,
+            self.composites_used.clone(),
+            self.scale,
+        ));
+        f.write_fmt(format_args!("{:.3} {}", self.value * data.1, data.0))
     }
 }
 impl ops::Add<Unit> for Unit {
@@ -513,7 +563,10 @@ impl ops::Add<Unit> for Unit {
             .union(&rhs.composites_used)
             .cloned()
             .collect();
-        Unit::new_composite(self.value + rhs.value*rhs.scale/self.scale, (self.powers, composites, self.scale))
+        Unit::new_composite(
+            self.value + rhs.value * rhs.scale / self.scale,
+            (self.powers, composites, self.scale),
+        )
     }
 }
 impl ops::Sub<Unit> for Unit {
@@ -531,7 +584,10 @@ impl ops::Sub<Unit> for Unit {
             .union(&rhs.composites_used)
             .cloned()
             .collect();
-        Unit::new_composite(self.value - rhs.value*rhs.scale/self.scale, (self.powers, composites, self.scale))
+        Unit::new_composite(
+            self.value - rhs.value * rhs.scale / self.scale,
+            (self.powers, composites, self.scale),
+        )
     }
 }
 impl ops::Mul<Unit> for Unit {
@@ -586,13 +642,19 @@ impl ops::Div<Unit> for Unit {
 impl ops::Mul<f64> for Unit {
     type Output = Unit;
     fn mul(self, rhs: f64) -> Self::Output {
-        Unit::new_composite(self.value * rhs, (self.powers, self.composites_used, self.scale))
+        Unit::new_composite(
+            self.value * rhs,
+            (self.powers, self.composites_used, self.scale),
+        )
     }
 }
 impl ops::Div<f64> for Unit {
     type Output = Unit;
     fn div(self, rhs: f64) -> Self::Output {
-        Unit::new_composite(self.value / rhs, (self.powers, self.composites_used, self.scale))
+        Unit::new_composite(
+            self.value / rhs,
+            (self.powers, self.composites_used, self.scale),
+        )
     }
 }
 

@@ -1,15 +1,12 @@
-use crate::{
-    modules::vector::Vector2,
-    objects::Object,
-};
-use serde::{Serialize, Deserialize};
 use super::ComponentSignature;
+use crate::{modules::vector::Vector2, objects::Object};
+use serde::{Deserialize, Serialize};
 
 /// # Translational
 /// * `id` - A unique ID
 /// * `velocity` - Velocity of the object
 /// * `requires` - Components which the component requires
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Translational {
     pub id: u32,
     pub velocity: Vector2<f64>,

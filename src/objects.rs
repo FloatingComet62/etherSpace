@@ -4,8 +4,12 @@ use crate::{
     modules::log::Log,
     registry::Registry,
 };
+use serde::{
+    de::{self, MapAccess, SeqAccess, Visitor},
+    ser::SerializeStruct,
+    Deserialize, Serialize,
+};
 use std::fmt;
-use serde::{ser::SerializeStruct, Deserialize, Serialize, de::{self, Visitor, SeqAccess, MapAccess}};
 
 fn convert_signature_to_index(
     vector: &Vec<&Component>,
@@ -28,7 +32,10 @@ fn trace_dependencies(
         if trail.contains(requirement) {
             critical!("Don't eat your own tail");
         }
-        let required_node = &root[convert_signature_to_index(root, requirement).unwrap()];
+        let required_node =
+            &root[convert_signature_to_index(root, requirement).unwrap_or_else(|| {
+                critical!("reached unreachable");
+            })];
         if required_node.get_requirements().len() == 0 {
             if !new_sort.contains(&required_node.signature()) {
                 new_sort.push(required_node.signature());
@@ -68,7 +75,11 @@ fn requirement_sort(vector: &mut Vec<&Component>) {
     }
     let mut new_vec = vec![];
     for item in new_sort.iter() {
-        new_vec.push(vector[convert_signature_to_index(vector, item).unwrap()]);
+        new_vec.push(
+            vector[convert_signature_to_index(vector, item).unwrap_or_else(|| {
+                critical!("reached unreachable");
+            })],
+        );
     }
     vector.clear();
     vector.append(&mut new_vec);
@@ -77,7 +88,7 @@ fn requirement_sort(vector: &mut Vec<&Component>) {
 /// # Object
 /// * `id` - A unique ID
 /// * `components` - A vector of ID of components
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Object {
     pub id: u32,
     pub components: Vec<u32>,
@@ -92,10 +103,7 @@ impl Object {
         }
     }
     pub fn new_from_yaml(id: u32, components: Vec<u32>) -> Self {
-        Self {
-            id, 
-            components,
-        }
+        Self { id, components }
     }
     /// * `signature` - Signature of the component to find
     pub fn get_component(&self, signature: ComponentSignature, registry: &Registry) -> Option<u32> {
@@ -117,7 +125,10 @@ impl Object {
     /// * `component_id` - Component ID of the component to add
     pub fn add_component(&mut self, component_id: u32, registry: &mut Registry) -> Option<()> {
         let component = registry.get_component(component_id);
-        if self.get_component(component.signature(), registry).is_some() {
+        if self
+            .get_component(component.signature(), registry)
+            .is_some()
+        {
             critical!(
                 "Cannot add the same component twice ({:?}) to object ({:})",
                 component.signature(),
@@ -155,8 +166,9 @@ impl Object {
 }
 impl Serialize for Object {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: serde::Serializer {
+    where
+        S: serde::Serializer,
+    {
         let mut state = serializer.serialize_struct("Object", 3)?;
         let _ = state.serialize_field("id", &self.id);
         let _ = state.serialize_field("components", &self.components);
@@ -165,12 +177,15 @@ impl Serialize for Object {
 }
 impl<'de> Deserialize<'de> for Object {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: serde::Deserializer<'de> {
-
+    where
+        D: serde::Deserializer<'de>,
+    {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "lowercase")]
-        enum Fields { ID, Components }
+        enum Fields {
+            ID,
+            Components,
+        }
 
         struct ObjectVisitor;
         impl<'de> Visitor<'de> for ObjectVisitor {
@@ -184,9 +199,11 @@ impl<'de> Deserialize<'de> for Object {
             where
                 V: SeqAccess<'de>,
             {
-                let id = seq.next_element()?
+                let id = seq
+                    .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let components = seq.next_element()?
+                let components = seq
+                    .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(1, &self))?;
                 Ok(Object::new_from_yaml(id, components))
             }
@@ -214,7 +231,8 @@ impl<'de> Deserialize<'de> for Object {
                     }
                 }
                 let id = id.ok_or_else(|| de::Error::missing_field("id"))?;
-                let components = components.ok_or_else(|| de::Error::missing_field("components"))?;
+                let components =
+                    components.ok_or_else(|| de::Error::missing_field("components"))?;
                 Ok(Object::new_from_yaml(id, components))
             }
         }

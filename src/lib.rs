@@ -1,8 +1,9 @@
 pub mod components;
+pub mod engine;
 pub mod errors;
 pub mod modules;
 pub mod objects;
 pub mod registry;
+pub mod renderer;
 pub mod shapes;
 pub mod world;
-pub mod renderer;

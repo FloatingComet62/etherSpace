@@ -21,8 +21,13 @@ impl Log {
 
 #[macro_export]
 macro_rules! info {
-    ($($e: expr),*) => {
-        Log::info(&format!($($e),*));
+    ($e: expr) => {
+        Log::info($e);
+    };
+    (object $obj: expr) => {
+        Log::info(
+            &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
+        );
     };
 }
 #[macro_export]

@@ -1,11 +1,11 @@
 use crate::objects::Object;
+use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
-use serde::{Serialize, Deserialize};
 
 pub mod transform;
 pub mod translational;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Component {
     Transform(transform::Transform),
     Translational(translational::Translational),
