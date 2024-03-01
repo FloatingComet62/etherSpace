@@ -32,35 +32,27 @@ impl World {
     }
 }
 #[macro_export]
-macro_rules! create_object {
-    ($engine: expr) => {{
+macro_rules! create {
+    (object $engine: expr) => {{
+        use ether_space::modules::vector::Vector2;
         let id = $engine.registry.create_object();
         $engine.world.objects.push(id);
 
-        let comp_id = ether_space::create_transform!(
-            $engine,
-            ether_space::modules::vector::Vector2::default()
-        );
+        let comp_id = ether_space::create!(transform $engine, Vector2::default());
         ether_space::add_component!($engine, id, comp_id);
-        Some(id)
+        id
     }};
+    (transform $engine: expr, $position: expr) => {
+        $engine.registry.create_transform($position)
+    };
+    (translational $engine: expr, $velocity: expr) => {
+        $engine.registry.create_translational($velocity)
+    };
 }
 #[macro_export]
 macro_rules! add_component {
     ($engine: expr, $object_id: expr, $component_id: expr) => {
         $engine.registry.add_component($object_id, $component_id)
-    };
-}
-#[macro_export]
-macro_rules! create_transform {
-    ($engine: expr, $position: expr) => {
-        $engine.registry.create_transform($position);
-    };
-}
-#[macro_export]
-macro_rules! create_translational {
-    ($engine: expr, $velocity: expr) => {
-        #engine.registry.create_translational($velocity)
     };
 }
 
