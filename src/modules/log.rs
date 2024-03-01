@@ -21,8 +21,8 @@ impl Log {
 
 #[macro_export]
 macro_rules! info {
-    ($e: expr) => {
-        Log::info($e);
+    ($($e: expr),*) => {
+        Log::info(&format!($($e),*));
     };
     (object $obj: expr) => {
         Log::info(
