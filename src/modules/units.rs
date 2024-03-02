@@ -1,4 +1,4 @@
-use crate::{critical, modules::log::Log};
+use crate::log;
 use core::fmt::Display;
 use std::{collections::BTreeSet, ops};
 
@@ -184,7 +184,7 @@ pub fn generate_powers_from_unit_str_composite(
 
     (
         powers.try_into().unwrap_or_else(|_| {
-            critical!("reached unreachable");
+            log!(err "reached unreachable");
         }),
         composite_units_used,
         scale * data.1,
@@ -244,7 +244,7 @@ fn generate_powers_from_unit_str(units_str: String) -> ([f64; NUM_OF_UNITS], f64
 
     (
         powers.try_into().unwrap_or_else(|_| {
-            critical!("reached unreachable");
+            log!(err "reached unreachable");
         }),
         scale,
     )
@@ -315,7 +315,7 @@ fn generate_unit_str_from_powers_composite(
             .clone()
             .try_into()
             .unwrap_or_else(|v: Vec<f64>| {
-                critical!(
+                log!(err
                     "Invalid power length, expected length to be {}, found {}",
                     NUM_OF_UNITS,
                     v.len()
@@ -475,7 +475,7 @@ impl Unit {
         let mut unit = Self {
             value,
             powers: powers.try_into().unwrap_or_else(|v: Vec<f64>| {
-                critical!(
+                log!(err
                     "Invalid power length, expected length to be {}, found {}",
                     NUM_OF_UNITS,
                     v.len()
@@ -505,7 +505,7 @@ impl Unit {
         let mut unit = Self {
             value,
             powers: data.0.try_into().unwrap_or_else(|v: Vec<f64>| {
-                critical!(
+                log!(err
                     "Invalid power length, expected length to be {}, found {}",
                     NUM_OF_UNITS,
                     v.len()
@@ -552,7 +552,7 @@ impl ops::Add<Unit> for Unit {
     type Output = Unit;
     fn add(self, rhs: Unit) -> Self::Output {
         if self.powers != rhs.powers {
-            critical!(
+            log!(err
                 "Cannot add 2 values with different units\nLHS units: {:?}\nRHS units: {:?}",
                 self.powers,
                 rhs.powers
@@ -573,7 +573,7 @@ impl ops::Sub<Unit> for Unit {
     type Output = Unit;
     fn sub(self, rhs: Unit) -> Self::Output {
         if self.powers != rhs.powers {
-            critical!(
+            log!(err
                 "Cannot subtract 2 values with different units\nLHS units: {:?}\nRHS units: {:?}",
                 self.powers,
                 rhs.powers

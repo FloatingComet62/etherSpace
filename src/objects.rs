@@ -1,7 +1,6 @@
 use crate::{
     components::{Component, ComponentSignature},
-    critical,
-    modules::log::Log,
+    log,
     registry::Registry,
 };
 use serde::{
@@ -30,11 +29,11 @@ fn trace_dependencies(
     let mut new_sort = vec![];
     for requirement in requirements.iter() {
         if trail.contains(requirement) {
-            critical!("Don't eat your own tail");
+            log!(err "Don't eat your own tail");
         }
         let required_node =
             &root[convert_signature_to_index(root, requirement).unwrap_or_else(|| {
-                critical!("reached unreachable");
+                log!(err "reached unreachable");
             })];
         if required_node.get_requirements().len() == 0 {
             if !new_sort.contains(&required_node.signature()) {
@@ -77,7 +76,7 @@ fn requirement_sort(vector: &mut Vec<&Component>) {
     for item in new_sort.iter() {
         new_vec.push(
             vector[convert_signature_to_index(vector, item).unwrap_or_else(|| {
-                critical!("reached unreachable");
+                log!(err "reached unreachable");
             })],
         );
     }
@@ -129,7 +128,7 @@ impl Object {
             .get_component(component.signature(), registry)
             .is_some()
         {
-            critical!(
+            log!(err
                 "Cannot add the same component twice ({:?}) to object ({:})",
                 component.signature(),
                 self.id

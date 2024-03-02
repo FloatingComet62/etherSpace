@@ -33,27 +33,36 @@ impl World {
 }
 #[macro_export]
 macro_rules! create {
-    (object $engine: expr) => {{
-        use ether_space::modules::vector::Vector2;
-        let id = $engine.registry.create_object();
-        $engine.world.objects.push(id);
-
-        let comp_id = ether_space::create!(transform $engine, Vector2::default());
-        ether_space::add_component!($engine, id, comp_id);
-        id
-    }};
-    (transform $engine: expr, $position: expr) => {
-        $engine.registry.create_transform($position)
+    (object $registry: expr) => {
+        $registry.create_object()
     };
-    (translational $engine: expr, $velocity: expr) => {
-        $engine.registry.create_translational($velocity)
+    (transform $registry: expr) => {
+        $registry.create_transform(ether_space::modules::vector::Vector2::default())
+    };
+    (transform $registry: expr, $position: expr) => {
+        $registry.create_transform($position)
+    };
+    (translational $registry: expr) => {
+        $registry.create_translational(ether_space::modules::vector::Vector2::default())
+    };
+    (translational $registry: expr, $velocity: expr) => {
+        $registry.create_translational($velocity)
     };
 }
 #[macro_export]
-macro_rules! add_component {
-    ($engine: expr, $object_id: expr, $component_id: expr) => {
-        $engine.registry.add_component($object_id, $component_id)
+macro_rules! add {
+    (component to object $registry: expr, $object_id: expr, $component_id: expr) => {
+        $registry.add_component($object_id, $component_id)
     };
+    (object to world $engine: expr, $object_id: expr) => {{
+        let obj = $engine.registry.get_object($object_id);
+        if let None = obj.get_component(ether_space::components::ComponentSignature::Transform, &$engine.registry) {
+            let transform = create!(transform $engine.registry);
+            log!(warn "Object({}) is missing a transform, a default Transform({}) was created", $object_id, transform);
+            add!(component to object $engine.registry, $object_id, transform);
+        }
+        $engine.world.objects.push($object_id)
+    }};
 }
 
 impl Serialize for World {

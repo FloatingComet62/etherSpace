@@ -1,12 +1,12 @@
-use ether_space::{create, engine::ESEngine, info, modules::log::Log};
+use ether_space::{create, add, engine::ESEngine, log};
 
 fn main() {
-    info!("Initializing");
+    log!(info "Initializing");
 
     let mut engine = ESEngine::new();
-    create!(object engine);
-    create!(object engine);
-    info!(object engine);
+    let obj_id = create!(object engine.registry);
+    add!(object to world engine, obj_id);
+    log!(info object engine);
 
-    info!("Exiting");
+    log!(info "Exiting");
 }

@@ -20,25 +20,29 @@ impl Log {
 }
 
 #[macro_export]
-macro_rules! info {
-    ($($e: expr),*) => {
-        Log::info(&format!($($e),*));
+macro_rules! log {
+    (info $($e: expr),*) => {
+        ether_space::modules::log::Log::info(&format!($($e),*));
     };
-    (object $obj: expr) => {
-        Log::info(
+    (info object $obj: expr) => {
+        ether_space::modules::log::Log::info(
             &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
         );
     };
-}
-#[macro_export]
-macro_rules! warn {
-    ($($e: expr),*) => {
-        Log::warn(&format!($($e),*));
+    (warn $($e: expr),*) => {
+        ether_space::modules::log::Log::warn(&format!($($e),*));
     };
-}
-#[macro_export]
-macro_rules! critical {
-    ($($e: expr),*) => {
-        Log::critical_debug(file!(), line!(), &format!($($e),*));
+    (warn object $obj: expr) => {
+        crate::modules::log::Log::warn(
+            &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
+        );
+    };
+    (err $($e: expr),*) => {
+        crate::modules::log::Log::critical_debug(file!(), line!(), &format!($($e),*));
+    };
+    (err object $obj: expr) => {
+        crate::modules::log::Log::critical_debug(
+            &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
+        );
     };
 }
