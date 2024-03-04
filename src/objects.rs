@@ -54,7 +54,7 @@ fn trace_dependencies(
     }
     new_sort
 }
-fn requirement_sort(vector: &mut Vec<&Component>) {
+pub fn requirement_sort(vector: &mut Vec<&Component>) {
     let mut new_sort = vec![];
     for item in vector.iter() {
         if item.get_requirements().len() == 0 {
@@ -89,41 +89,35 @@ fn requirement_sort(vector: &mut Vec<&Component>) {
 /// * `components` - A vector of ID of components
 #[derive(Clone, Debug, Default)]
 pub struct Object {
-    pub id: u32,
-    pub components: Vec<u32>,
+    pub id: usize,
+    pub components: Vec<usize>,
 }
 impl Object {
     /// * `id` - ID of the object
     /// * `registry` - The entire registry of etherSpace
-    pub fn new(id: u32) -> Self {
+    pub fn new(id: usize) -> Self {
         Self {
             id,
             components: Vec::new(),
         }
     }
-    pub fn new_from_yaml(id: u32, components: Vec<u32>) -> Self {
+    pub fn new_from_yaml(id: usize, components: Vec<usize>) -> Self {
         Self { id, components }
     }
     /// * `signature` - Signature of the component to find
-    pub fn get_component(&self, signature: ComponentSignature, registry: &Registry) -> Option<u32> {
+    pub fn get_component(&self, signature: ComponentSignature, registry: &Registry) -> Option<Component> {
         for component_id in self.components.iter() {
-            let component = registry.get_component(*component_id);
+            let component = &registry.components[*component_id as usize];
             if component.signature() == signature {
-                return Some(component_id.clone());
+                return Some(component.clone());
             }
         }
         None
     }
-    pub fn get_component_ids(&self) -> &Vec<u32> {
-        &self.components
-    }
-    pub fn get_component_ids_mut(&mut self) -> &mut Vec<u32> {
-        &mut self.components
-    }
     /// Add a component to the object
     /// * `component_id` - Component ID of the component to add
-    pub fn add_component(&mut self, component_id: u32, registry: &mut Registry) -> Option<()> {
-        let component = registry.get_component(component_id);
+    pub fn add_component(&mut self, component_id: usize, registry: &mut Registry) {
+        let component = &registry.components[component_id as usize];
         if self
             .get_component(component.signature(), registry)
             .is_some()
@@ -135,32 +129,6 @@ impl Object {
             );
         }
         self.components.push(component_id);
-        Some(())
-    }
-    pub fn start(&mut self, registry: &mut Registry) -> Option<()> {
-        // Sort the components vector according to the requirements
-        let mut binding = self
-            .components
-            .iter()
-            .map(|component_id| registry.get_component(*component_id))
-            .collect();
-        requirement_sort(&mut binding);
-        for (i, binding_item) in binding.iter().enumerate() {
-            self.components[i] = binding_item.get_id();
-        }
-
-        for component_id in self.components.iter() {
-            let component = registry.get_component_mut(*component_id);
-            component.start(&mut self.clone());
-        }
-        Some(())
-    }
-    pub fn update(&mut self, registry: &mut Registry) -> Option<()> {
-        for component_id in self.components.iter() {
-            let component = registry.get_component_mut(*component_id);
-            component.update(&self);
-        }
-        Some(())
     }
 }
 impl Serialize for Object {

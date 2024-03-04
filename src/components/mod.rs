@@ -1,4 +1,3 @@
-use crate::objects::Object;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
@@ -11,22 +10,10 @@ pub enum Component {
     Translational(translational::Translational),
 }
 impl Component {
-    pub fn get_id(&self) -> u32 {
+    pub fn get_id(&self) -> usize {
         match self {
             Component::Transform(component) => component.id,
             Component::Translational(component) => component.id,
-        }
-    }
-    pub fn start(&mut self, object: &mut Object) {
-        match self {
-            Component::Transform(component) => component.start(object),
-            Component::Translational(component) => component.start(object),
-        }
-    }
-    pub fn update(&mut self, object: &&mut Object) {
-        match self {
-            Component::Transform(component) => component.update(object),
-            Component::Translational(component) => component.update(object),
         }
     }
     pub fn signature(&self) -> ComponentSignature {

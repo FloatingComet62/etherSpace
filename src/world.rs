@@ -10,20 +10,20 @@ use std::fmt;
 /// * `gravity` - Global gravity
 #[derive(Default, Debug)]
 pub struct World {
-    pub id: u32,
-    pub objects: Vec<u32>,
+    pub id: usize,
+    pub objects: Vec<usize>,
     pub gravity: f32,
 }
 impl World {
     /// * `id` - ID of the world
-    pub fn new(id: u32) -> Self {
+    pub fn new(id: usize) -> Self {
         Self {
             id,
             objects: Vec::new(),
             gravity: 9.8,
         }
     }
-    pub fn new_from_yaml(id: u32, objects: Vec<u32>, gravity: f32) -> Self {
+    pub fn new_from_yaml(id: usize, objects: Vec<usize>, gravity: f32) -> Self {
         Self {
             id,
             objects,
@@ -55,7 +55,7 @@ macro_rules! add {
         $registry.add_component($object_id, $component_id)
     };
     (object to world $engine: expr, $object_id: expr) => {{
-        let obj = $engine.registry.get_object($object_id);
+        let obj = &$engine.registry.objects[$object_id];
         if let None = obj.get_component(ether_space::components::ComponentSignature::Transform, &$engine.registry) {
             let transform = create!(transform $engine.registry);
             log!(warn "Object({}) is missing a transform, a default Transform({}) was created", $object_id, transform);
@@ -64,7 +64,69 @@ macro_rules! add {
         $engine.world.objects.push($object_id)
     }};
 }
-
+#[macro_export]
+macro_rules! start {
+    (component $component: expr, $object: expr) => {
+        match $component.signature() {
+            ether_space::components::ComponentSignature::Transform => {}
+            ether_space::components::ComponentSignature::TranslationalPhysics => {}
+        }
+    };
+    (components $registry: expr, $object: expr, $component_ids: expr) => {
+        // Sort the components vector according to the requirements
+        let mut binding = $component_ids
+            .iter()
+            .map(|id| &$registry.components[*id])
+            .collect();
+        ether_space::objects::requirement_sort(&mut binding);
+        binding.iter().enumerate().for_each(|(i, binding_item)| $component_ids[i] = binding_item.get_id());
+        // don't par_iter this in the future (keeping requirements in check)
+        $component_ids.iter().for_each(|id| {
+            let mut component = &mut $registry.components[*id];
+            log!(info "Initialization of Component({}:{})", id, component.signature());
+            start!(component component, $object);
+        });
+    };
+    (objects $registry: expr, $object_ids: expr) => {
+        $object_ids.iter_mut().for_each(|id| {
+            log!(info "Initialization of Object({})", id);
+            let mut object = &mut $registry.objects[*id];
+            start!(components $registry, object, object.components);
+        });
+    }
+}
+#[macro_export]
+macro_rules! update {
+    (component $component: expr, $object: expr) => {
+        update!(component $component, $object, 0);
+    };
+    (component $component: expr, $object: expr, $frame: expr) => {
+        match $component.signature() {
+            ether_space::components::ComponentSignature::Transform => {}
+            ether_space::components::ComponentSignature::TranslationalPhysics => {}
+        }
+    };
+    (components $registry: expr, $object: expr) => {
+        update!(components $registry, $object, 0);
+    };
+    (components $registry: expr, $object: expr, $frame: expr) => {
+        $object.components.iter_mut().for_each(|id| {
+            let component = &mut $registry.components[*id];
+            log!(info "[{}] Updating of Component({}:{})", $frame, id, component.signature());
+            update!(component component, object);
+        });
+    };
+    (objects $registry: expr, $world: expr) => {
+        update!(objects $registry, $world, 0);
+    };
+    (objects $registry: expr, $world: expr, $frame: expr) => {
+        $world.objects.iter_mut().for_each(|id| {
+            let object = &mut $registry.objects[*id];
+            log!(info "[{}] Updating of Object({})", $frame, id);
+            update!(components $registry, object);
+        });
+    }
+}
 impl Serialize for World {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

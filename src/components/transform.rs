@@ -1,5 +1,5 @@
 use super::ComponentSignature;
-use crate::{modules::vector::Vector2, objects::Object};
+use crate::modules::vector::Vector2;
 use serde::{Deserialize, Serialize};
 
 /// # Transform
@@ -8,12 +8,12 @@ use serde::{Deserialize, Serialize};
 /// * `requires` - Components which the component requires
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Transform {
-    pub id: u32,
+    pub id: usize,
     pub position: Vector2<f64>,
     requires: Vec<ComponentSignature>,
 }
 impl Transform {
-    pub fn new(id: u32, position: Vector2<f64>) -> Self {
+    pub fn new(id: usize, position: Vector2<f64>) -> Self {
         Self {
             id,
             position,
@@ -23,6 +23,4 @@ impl Transform {
     pub fn get_requirements(&self) -> Vec<ComponentSignature> {
         self.requires.clone()
     }
-    pub fn start(&mut self, _object: &mut Object) {}
-    pub fn update(&mut self, _object: &&mut Object) {}
 }
