@@ -8,7 +8,7 @@ use std::fmt;
 /// # World
 /// * `id` - A unique id
 /// * `gravity` - Global gravity
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct World {
     pub id: usize,
     pub objects: Vec<usize>,
@@ -97,13 +97,13 @@ macro_rules! start {
 }
 #[macro_export]
 macro_rules! update {
-    (component $component: expr, $object: expr) => {
-        update!(component $component, $object, 0);
+    (component $component: expr, $object: expr, $registry: expr) => {
+        update!(component $component, $object, $registry, 0);
     };
-    (component $component: expr, $object: expr, $frame: expr) => {
-        match $component.signature() {
-            ether_space::components::ComponentSignature::Transform => {}
-            ether_space::components::ComponentSignature::TranslationalPhysics => {}
+    (component $component: expr, $object: expr, $registry: expr, $frame: expr) => {
+        match $component {
+            ether_space::components::Component::Transform(component) => {}
+            ether_space::components::Component::Translational(component) => {}
         }
     };
     (components $registry: expr, $object: expr) => {
@@ -113,7 +113,7 @@ macro_rules! update {
         $object.components.iter_mut().for_each(|id| {
             let component = &mut $registry.components[*id];
             log!(info "[{}] Updating of Component({}:{})", $frame, id, component.signature());
-            update!(component component, object);
+            update!(component component, $object, $registry);
         });
     };
     (objects $registry: expr, $world: expr) => {
@@ -123,7 +123,7 @@ macro_rules! update {
         $world.objects.iter_mut().for_each(|id| {
             let object = &mut $registry.objects[*id];
             log!(info "[{}] Updating of Object({})", $frame, id);
-            update!(components $registry, object);
+            update!(components $registry, object, $frame);
         });
     }
 }

@@ -3,12 +3,7 @@ use crate::{
     log,
     registry::Registry,
 };
-use serde::{
-    de::{self, MapAccess, SeqAccess, Visitor},
-    ser::SerializeStruct,
-    Deserialize, Serialize,
-};
-use std::fmt;
+use serde::{Deserialize, Serialize};
 
 fn convert_signature_to_index(
     vector: &Vec<&Component>,
@@ -33,7 +28,7 @@ fn trace_dependencies(
         }
         let required_node =
             &root[convert_signature_to_index(root, requirement).unwrap_or_else(|| {
-                log!(err "reached unreachable");
+                log!(err "Requirement {:?} are not fulfiled", requirement);
             })];
         if required_node.get_requirements().len() == 0 {
             if !new_sort.contains(&required_node.signature()) {
@@ -87,7 +82,7 @@ pub fn requirement_sort(vector: &mut Vec<&Component>) {
 /// # Object
 /// * `id` - A unique ID
 /// * `components` - A vector of ID of components
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Object {
     pub id: usize,
     pub components: Vec<usize>,
@@ -105,11 +100,29 @@ impl Object {
         Self { id, components }
     }
     /// * `signature` - Signature of the component to find
-    pub fn get_component(&self, signature: ComponentSignature, registry: &Registry) -> Option<Component> {
+    pub fn get_component<'a>(
+        &self,
+        signature: ComponentSignature,
+        registry: &'a Registry,
+    ) -> Option<&'a Component> {
         for component_id in self.components.iter() {
             let component = &registry.components[*component_id as usize];
             if component.signature() == signature {
-                return Some(component.clone());
+                return Some(component);
+            }
+        }
+        None
+    }
+    /// * `signature` - Signature of the component to find
+    pub fn get_component_mut<'a>(
+        &self,
+        signature: ComponentSignature,
+        registry: &'a mut Registry,
+    ) -> Option<&'a mut Component> {
+        for component_id in self.components.iter() {
+            let component = &registry.components[*component_id as usize];
+            if component.signature() == signature {
+                return Some(&mut registry.components[*component_id as usize]);
             }
         }
         None
@@ -129,82 +142,5 @@ impl Object {
             );
         }
         self.components.push(component_id);
-    }
-}
-impl Serialize for Object {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_struct("Object", 3)?;
-        let _ = state.serialize_field("id", &self.id);
-        let _ = state.serialize_field("components", &self.components);
-        state.end()
-    }
-}
-impl<'de> Deserialize<'de> for Object {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "lowercase")]
-        enum Fields {
-            ID,
-            Components,
-        }
-
-        struct ObjectVisitor;
-        impl<'de> Visitor<'de> for ObjectVisitor {
-            type Value = Object;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("struct Object")
-            }
-
-            fn visit_seq<V>(self, mut seq: V) -> Result<Object, V::Error>
-            where
-                V: SeqAccess<'de>,
-            {
-                let id = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let components = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(1, &self))?;
-                Ok(Object::new_from_yaml(id, components))
-            }
-
-            fn visit_map<V>(self, mut map: V) -> Result<Object, V::Error>
-            where
-                V: MapAccess<'de>,
-            {
-                let mut id = None;
-                let mut components = None;
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Fields::ID => {
-                            if id.is_some() {
-                                return Err(de::Error::duplicate_field("id"));
-                            }
-                            id = Some(map.next_value()?);
-                        }
-                        Fields::Components => {
-                            if components.is_some() {
-                                return Err(de::Error::duplicate_field("components"));
-                            }
-                            components = Some(map.next_value()?);
-                        }
-                    }
-                }
-                let id = id.ok_or_else(|| de::Error::missing_field("id"))?;
-                let components =
-                    components.ok_or_else(|| de::Error::missing_field("components"))?;
-                Ok(Object::new_from_yaml(id, components))
-            }
-        }
-
-        const FIELDS: &'static [&'static str] = &["id", "components"];
-        deserializer.deserialize_struct("World", FIELDS, ObjectVisitor)
     }
 }
