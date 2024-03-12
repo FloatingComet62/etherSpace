@@ -9,15 +9,15 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Translational {
     pub id: usize,
-    pub velocity: Vector2<f64>,
+    pub velocity: Vector2,
     requires: Vec<ComponentSignature>,
 }
 impl Translational {
-    pub fn new(id: usize, velocity: Vector2<f64>) -> Self {
+    pub fn new(id: usize, velocity: Vector2) -> Self {
         Self {
             id,
             velocity,
-            requires: vec![ComponentSignature::Transform],
+            requires: vec![],
         }
     }
     pub fn get_requirements(&self) -> Vec<ComponentSignature> {

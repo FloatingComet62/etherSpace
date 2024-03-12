@@ -5,14 +5,8 @@ use ether_space::{
 fn main() {
     log!(info "Initializing");
 
-    let mut engine = ESEngine::new(Box::new(SDLRenderer::new()));
-    let obj_id = create!(object engine.registry);
-    add!(object to world engine, obj_id);
-
-    let obj_id = create!(object engine.registry);
-    let comp_id = create!(translational engine.registry);
-    add!(component to object engine.registry, obj_id, comp_id);
-    add!(object to world engine, obj_id);
+    let mut engine = ESEngine::load_file("data.txt").expect("Failed to load the engine");
+    engine.renderer = Some(Box::new(SDLRenderer::new()));
 
     start!(objects engine.registry, engine.world.objects);
 
@@ -34,6 +28,5 @@ fn main() {
         }
     }
 
-    log!(info object engine);
     log!(info "Exiting");
 }

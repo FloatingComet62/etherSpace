@@ -1,0 +1,34 @@
+world:
+  id: 0
+  objects:
+  - 0
+  - 1
+  gravity: 9.8
+registry:
+  components:
+  - !Transform
+    id: 0
+    position:
+      x: 0.0
+      y: 0.0
+    requires: []
+  - !Translational
+    id: 1
+    velocity:
+      x: 0.0
+      y: 0.0
+    requires: []
+  - !Transform
+    id: 2
+    position:
+      x: 0.0
+      y: 0.0
+    requires: []
+  objects:
+  - id: 0
+    components:
+    - 0
+  - id: 1
+    components:
+    - 1
+    - 2

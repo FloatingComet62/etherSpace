@@ -5,7 +5,7 @@ use serde::{
     ser::SerializeStruct,
     Deserialize, Serialize,
 };
-use std::fmt;
+use std::{fmt, fs};
 
 pub struct ESEngine {
     pub world: World,
@@ -26,6 +26,13 @@ impl ESEngine {
             registry,
             renderer: None,
         }
+    }
+    pub fn to_file(&self, file_name: &str) -> Option<()> {
+        fs::write(file_name, serde_yaml::to_string(self).ok()?).ok()?;
+        Some(())
+    }
+    pub fn load_file(file_name: &str) -> Option<Self> {
+        serde_yaml::from_str(&fs::read_to_string(file_name).ok()?).ok()?
     }
 }
 impl Debug for ESEngine {

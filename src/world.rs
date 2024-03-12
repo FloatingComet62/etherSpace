@@ -97,30 +97,21 @@ macro_rules! start {
 }
 #[macro_export]
 macro_rules! update {
-    (component $component: expr, $object: expr, $registry: expr) => {
-        update!(component $component, $object, $registry, 0);
-    };
     (component $component: expr, $object: expr, $registry: expr, $frame: expr) => {
         match $component {
             ether_space::components::Component::Transform(component) => {}
             ether_space::components::Component::Translational(component) => {}
         }
     };
-    (components $registry: expr, $object: expr) => {
-        update!(components $registry, $object, 0);
-    };
     (components $registry: expr, $object: expr, $frame: expr) => {
-        $object.components.iter_mut().for_each(|id| {
+        $object.components.iter().for_each(|id| {
             let component = &mut $registry.components[*id];
             log!(info "[{}] Updating of Component({}:{})", $frame, id, component.signature());
-            update!(component component, $object, $registry);
+            update!(component component, $object, $registry, $frame);
         });
     };
-    (objects $registry: expr, $world: expr) => {
-        update!(objects $registry, $world, 0);
-    };
     (objects $registry: expr, $world: expr, $frame: expr) => {
-        $world.objects.iter_mut().for_each(|id| {
+        $world.objects.iter().for_each(|id| {
             let object = &mut $registry.objects[*id];
             log!(info "[{}] Updating of Object({})", $frame, id);
             update!(components $registry, object, $frame);

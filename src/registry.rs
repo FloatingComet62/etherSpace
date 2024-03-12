@@ -18,14 +18,14 @@ impl Registry {
         }
     }
     #[inline]
-    pub fn create_transform(&mut self, position: Vector2<f64>) -> usize {
+    pub fn create_transform(&mut self, position: Vector2) -> usize {
         let id = self.components.len();
         self.components
             .push(Component::Transform(Transform::new(id, position)));
         id
     }
     #[inline]
-    pub fn create_translational(&mut self, velocity: Vector2<f64>) -> usize {
+    pub fn create_translational(&mut self, velocity: Vector2) -> usize {
         let id = self.components.len();
         self.components
             .push(Component::Translational(Translational::new(id, velocity)));

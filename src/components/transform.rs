@@ -9,11 +9,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Transform {
     pub id: usize,
-    pub position: Vector2<f64>,
+    pub position: Vector2,
     requires: Vec<ComponentSignature>,
 }
 impl Transform {
-    pub fn new(id: usize, position: Vector2<f64>) -> Self {
+    pub fn new(id: usize, position: Vector2) -> Self {
         Self {
             id,
             position,
