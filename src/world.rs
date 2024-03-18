@@ -56,9 +56,16 @@ macro_rules! add {
     };
     (object to world $engine: expr, $object_id: expr) => {{
         let obj = &$engine.registry.objects[$object_id];
-        if let None = obj.get_component(ether_space::components::ComponentSignature::Transform, &$engine.registry) {
+        if let None = obj.get_component(
+            ether_space::components::ComponentSignature::Transform,
+            &$engine.registry
+        ) {
             let transform = create!(transform $engine.registry);
-            log!(warn "Object({}) is missing a transform, a default Transform({}) was created", $object_id, transform);
+            log!(
+                warn "Object({}) is missing a transform, a default Transform({}) was created",
+                $object_id,
+                transform
+            );
             add!(component to object $engine.registry, $object_id, transform);
         }
         $engine.world.objects.push($object_id)
@@ -79,7 +86,10 @@ macro_rules! start {
             .map(|id| &$registry.components[*id])
             .collect();
         ether_space::objects::requirement_sort(&mut binding);
-        binding.iter().enumerate().for_each(|(i, binding_item)| $component_ids[i] = binding_item.get_id());
+        binding
+            .iter()
+            .enumerate()
+            .for_each(|(i, binding_item)| $component_ids[i] = binding_item.get_id());
         // don't par_iter this in the future (keeping requirements in check)
         $component_ids.iter().for_each(|id| {
             let mut component = &mut $registry.components[*id];

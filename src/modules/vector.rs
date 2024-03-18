@@ -1,6 +1,6 @@
 use core::fmt::Debug;
-use std::ops::{Add, AddAssign, Sub, SubAssign};
 use serde::{Deserialize, Serialize};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 // DO I REALLY NEED A GENERIC VECTOR???
 
@@ -18,16 +18,13 @@ impl Vector2 {
 
 impl Default for Vector2 {
     fn default() -> Self {
-        Self {
-            x: 0.0,
-            y: 0.0
-        }
+        Self { x: 0.0, y: 0.0 }
     }
 }
 impl Add for Vector2 {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
-        Vector2::new(self.x + rhs.x, self.y + rhs.y)        
+        Vector2::new(self.x + rhs.x, self.y + rhs.y)
     }
 }
 impl AddAssign for Vector2 {
@@ -39,7 +36,7 @@ impl AddAssign for Vector2 {
 impl Sub for Vector2 {
     type Output = Self;
     fn sub(self, rhs: Self) -> Self::Output {
-        Vector2::new(self.x - rhs.x, self.y - rhs.y)        
+        Vector2::new(self.x - rhs.x, self.y - rhs.y)
     }
 }
 impl SubAssign for Vector2 {
