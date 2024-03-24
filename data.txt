@@ -14,8 +14,8 @@ component_registry:
 - !Transform
   id: 1
   position:
-    x: 347.0
-    y: 347.0
+    x: 0.0
+    y: 0.0
   requires: []
 - !Transform
   id: 2

@@ -1,5 +1,5 @@
 use super::ComponentSignature;
-use crate::modules::vector::Vector2;
+use crate::{modules::vector::Vector2, objects::Object, registry::ComponentRegistry};
 use serde::{Deserialize, Serialize};
 
 /// # Translational
@@ -23,4 +23,6 @@ impl Translational {
     pub fn get_requirements(&self) -> Vec<ComponentSignature> {
         self.requires.clone()
     }
+    pub fn start(&mut self, _object: &mut Object) {}
+    pub fn update(&mut self, _object: &mut Object, _component_registry: &ComponentRegistry) {}
 }

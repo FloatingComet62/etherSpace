@@ -5,6 +5,13 @@ use serde::{
 };
 use std::fmt;
 
+use crate::{
+    components::ComponentSignature,
+    log,
+    modules::vector::Vector2,
+    registry::{ComponentRegistry, ObjectRegistry},
+};
+
 /// # World
 /// * `id` - A unique id
 /// * `gravity` - Global gravity
@@ -29,6 +36,24 @@ impl World {
             objects,
             gravity,
         }
+    }
+    pub fn add_object(
+        &mut self,
+        object_id: usize,
+        object_registry: &mut ObjectRegistry,
+        component_registry: &mut ComponentRegistry,
+    ) {
+        let obj = &object_registry.0[object_id];
+        if let None = obj.get_component(ComponentSignature::Transform, &component_registry) {
+            let transform = component_registry.create_transform(Vector2::default());
+            log!(
+                warn crate "Object({}) is missing a transform, a default Transform({}) was created",
+                object_id,
+                transform
+            );
+            object_registry.add_component(object_id, transform);
+        }
+        self.objects.push(object_id)
     }
 }
 impl Serialize for World {

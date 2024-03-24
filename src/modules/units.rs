@@ -1,6 +1,6 @@
+use crate::log;
 use core::fmt::Display;
 use std::{collections::BTreeSet, ops};
-use crate::log;
 
 const NUM_OF_UNITS: usize = 6;
 pub enum Units {

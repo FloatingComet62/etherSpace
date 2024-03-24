@@ -1,5 +1,8 @@
 use crate::{
-    registry::{ComponentRegistry, ObjectRegistry},
+    components::{Component, ComponentSignature},
+    log,
+    registry::ComponentRegistry,
+    registry::ObjectRegistry,
     renderer::Renderer,
     world::World,
 };
@@ -11,11 +14,86 @@ use serde::{
 };
 use std::{fmt, fs};
 
+fn convert_signature_to_index(
+    vector: &Vec<&Component>,
+    signature: &ComponentSignature,
+) -> Option<usize> {
+    for (i, item) in vector.iter().enumerate() {
+        if item.signature() == *signature {
+            return Some(i);
+        }
+    }
+    None
+}
+fn trace_dependencies(
+    root: &Vec<&Component>,
+    requirements: &Vec<ComponentSignature>,
+    trail: &mut Vec<ComponentSignature>,
+) -> Vec<ComponentSignature> {
+    let mut new_sort = vec![];
+    for requirement in requirements.iter() {
+        if trail.contains(requirement) {
+            log!(err crate "Don't eat your own tail");
+        }
+        let required_node =
+            &root[convert_signature_to_index(root, requirement).unwrap_or_else(|| {
+                log!(err crate "Requirement {:?} are not fulfiled", requirement);
+            })];
+        if required_node.get_requirements().len() == 0 {
+            if !new_sort.contains(&required_node.signature()) {
+                new_sort.push(required_node.signature());
+            }
+            continue;
+        }
+        trail.push(required_node.signature());
+        for to_add in trace_dependencies(root, &required_node.get_requirements(), trail) {
+            if !new_sort.contains(&to_add) {
+                new_sort.push(to_add);
+            }
+        }
+        trail.pop();
+        if !new_sort.contains(&required_node.signature()) {
+            new_sort.push(required_node.signature());
+        }
+    }
+    new_sort
+}
+pub fn requirement_sort(vector: &mut Vec<&Component>) {
+    let mut new_sort = vec![];
+    for item in vector.iter() {
+        if item.get_requirements().len() == 0 {
+            if !new_sort.contains(&item.signature()) {
+                new_sort.push(item.signature());
+            }
+            continue;
+        }
+        for to_add in trace_dependencies(vector, &item.get_requirements(), &mut vec![]) {
+            if !new_sort.contains(&to_add) {
+                new_sort.push(to_add);
+            }
+        }
+        if !new_sort.contains(&item.signature()) {
+            new_sort.push(item.signature());
+        }
+    }
+    let mut new_vec = vec![];
+    for item in new_sort.iter() {
+        new_vec.push(
+            vector[convert_signature_to_index(vector, item).unwrap_or_else(|| {
+                log!(err crate "reached unreachable");
+            })],
+        );
+    }
+    vector.clear();
+    vector.append(&mut new_vec);
+}
+
 pub struct ESEngine {
     pub world: World,
     pub component_registry: ComponentRegistry,
     pub object_registry: ObjectRegistry,
     pub renderer: Option<Box<dyn Renderer>>,
+    pub frame: u32,
 }
 impl ESEngine {
     pub fn new(renderer: Option<Box<dyn Renderer>>) -> Self {
@@ -23,6 +101,7 @@ impl ESEngine {
             world: World::new(0),
             component_registry: ComponentRegistry::new(),
             object_registry: ObjectRegistry::new(),
+            frame: 0,
             renderer,
         }
     }
@@ -35,6 +114,7 @@ impl ESEngine {
             world,
             component_registry,
             object_registry,
+            frame: 0,
             renderer: None,
         }
     }
@@ -44,6 +124,41 @@ impl ESEngine {
     }
     pub fn load_file(file_name: &str) -> Option<Self> {
         serde_yaml::from_str(&fs::read_to_string(file_name).ok()?).ok()?
+    }
+    pub fn start(&mut self) {
+        self.world.objects.iter_mut().for_each(|id| {
+            log!(info crate "Initialization of Object({})", id);
+            let object = &mut self.object_registry.0[*id];
+            let obj_reg_clone = self.component_registry.0.clone();
+            let mut binding = object
+                .components
+                .iter()
+                .map(|id| &obj_reg_clone[*id])
+                .collect();
+            requirement_sort(&mut binding);
+            binding
+                .iter()
+                .enumerate()
+                .for_each(|(i, binding_item)| object.components[i] = binding_item.get_id());
+            // don't par_iter this in the future (keeping requirements in check)
+            object.components.clone().iter().for_each(|id| {
+                let component = &mut self.component_registry.0[*id];
+                log!(info crate "Initialization of Component({}:{})", id, component.signature());
+                component.start(object);
+            });
+        });
+    }
+    pub fn update(&mut self) {
+        self.world.objects.iter().for_each(|id| {
+            let object = &mut self.object_registry.0[*id];
+            log!(info crate "[{}] Updating of Object({})", self.frame, id);
+            object.components.clone().iter().for_each(|id| {
+                let comp_reg_clone = self.component_registry.clone();
+                let component = &mut self.component_registry.0[*id];
+                log!(info crate "[{}] Updating of Component({}:{})", self.frame, id, component.signature());
+                component.update(object, &comp_reg_clone);
+            });
+        });
     }
 }
 impl Debug for ESEngine {

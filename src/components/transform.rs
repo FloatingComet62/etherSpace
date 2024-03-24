@@ -1,5 +1,5 @@
-use super::ComponentSignature;
-use crate::modules::vector::Vector2;
+use super::{Component, ComponentSignature};
+use crate::{modules::vector::Vector2, objects::Object, registry::ComponentRegistry};
 use serde::{Deserialize, Serialize};
 
 /// # Transform
@@ -22,5 +22,15 @@ impl Transform {
     }
     pub fn get_requirements(&self) -> Vec<ComponentSignature> {
         self.requires.clone()
+    }
+    pub fn start(&mut self, _object: &mut Object) {}
+    pub fn update(&mut self, object: &mut Object, component_registry: &ComponentRegistry) {
+        if let Some(Component::Translational(translational)) = object.get_component(
+            ComponentSignature::TranslationalPhysics,
+            &component_registry,
+        ) {
+            self.position.x += translational.velocity.x;
+            self.position.y += translational.velocity.y;
+        }
     }
 }

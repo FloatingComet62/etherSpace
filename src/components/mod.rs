@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
+use crate::{objects::Object, registry::ComponentRegistry};
+
 pub mod transform;
 pub mod translational;
 
@@ -26,6 +28,18 @@ impl Component {
         match self {
             Component::Transform(component) => component.get_requirements(),
             Component::Translational(component) => component.get_requirements(),
+        }
+    }
+    pub fn start(&mut self, object: &mut Object) {
+        match self {
+            Component::Transform(component) => component.start(object),
+            Component::Translational(component) => component.start(object),
+        }
+    }
+    pub fn update(&mut self, object: &mut Object, component_registry: &ComponentRegistry) {
+        match self {
+            Component::Transform(component) => component.update(object, component_registry),
+            Component::Translational(component) => component.update(object, component_registry),
         }
     }
 }
