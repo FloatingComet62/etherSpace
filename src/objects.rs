@@ -1,7 +1,7 @@
 use crate::{
     components::{Component, ComponentSignature},
     log,
-    registry::Registry,
+    registry::ComponentRegistry,
 };
 use serde::{Deserialize, Serialize};
 
@@ -103,10 +103,10 @@ impl Object {
     pub fn get_component<'a>(
         &self,
         signature: ComponentSignature,
-        registry: &'a Registry,
+        registry: &'a ComponentRegistry,
     ) -> Option<&'a Component> {
         for component_id in self.components.iter() {
-            let component = &registry.components[*component_id as usize];
+            let component = &registry.0[*component_id as usize];
             if component.signature() == signature {
                 return Some(component);
             }
@@ -117,20 +117,20 @@ impl Object {
     pub fn get_component_mut<'a>(
         &self,
         signature: ComponentSignature,
-        registry: &'a mut Registry,
+        registry: &'a mut ComponentRegistry,
     ) -> Option<&'a mut Component> {
         for component_id in self.components.iter() {
-            let component = &registry.components[*component_id as usize];
+            let component = &registry.0[*component_id as usize];
             if component.signature() == signature {
-                return Some(&mut registry.components[*component_id as usize]);
+                return Some(&mut registry.0[*component_id as usize]);
             }
         }
         None
     }
     /// Add a component to the object
     /// * `component_id` - Component ID of the component to add
-    pub fn add_component(&mut self, component_id: usize, registry: &mut Registry) {
-        let component = &registry.components[component_id as usize];
+    pub fn add_component(&mut self, component_id: usize, registry: &mut ComponentRegistry) {
+        let component = &registry.0[component_id as usize];
         if self
             .get_component(component.signature(), registry)
             .is_some()

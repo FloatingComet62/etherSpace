@@ -1,4 +1,8 @@
-use crate::{registry::Registry, renderer::Renderer, world::World};
+use crate::{
+    registry::{ComponentRegistry, ObjectRegistry},
+    renderer::Renderer,
+    world::World,
+};
 use core::fmt::Debug;
 use serde::{
     de::{self, MapAccess, SeqAccess, Visitor},
@@ -9,21 +13,28 @@ use std::{fmt, fs};
 
 pub struct ESEngine {
     pub world: World,
-    pub registry: Registry,
+    pub component_registry: ComponentRegistry,
+    pub object_registry: ObjectRegistry,
     pub renderer: Option<Box<dyn Renderer>>,
 }
 impl ESEngine {
-    pub fn new(renderer: Box<dyn Renderer>) -> Self {
+    pub fn new(renderer: Option<Box<dyn Renderer>>) -> Self {
         Self {
             world: World::new(0),
-            registry: Registry::new(),
-            renderer: Some(renderer),
+            component_registry: ComponentRegistry::new(),
+            object_registry: ObjectRegistry::new(),
+            renderer,
         }
     }
-    pub fn from_yaml(world: World, registry: Registry) -> Self {
+    pub fn from_yaml(
+        world: World,
+        component_registry: ComponentRegistry,
+        object_registry: ObjectRegistry,
+    ) -> Self {
         Self {
             world,
-            registry,
+            component_registry,
+            object_registry,
             renderer: None,
         }
     }
@@ -41,11 +52,13 @@ impl Debug for ESEngine {
         #[derive(Debug)]
         struct StrippedEngine {
             world: World,
-            registry: Registry,
+            component_registry: ComponentRegistry,
+            object_registry: ObjectRegistry,
         }
         let n = StrippedEngine {
             world: self.world.clone(),
-            registry: self.registry.clone(),
+            component_registry: self.component_registry.clone(),
+            object_registry: self.object_registry.clone(),
         };
         f.write_fmt(format_args!("{:?}", n))
     }
@@ -57,7 +70,9 @@ impl Serialize for ESEngine {
     {
         let mut state = serializer.serialize_struct("Engine", 3)?;
         let _ = state.serialize_field("world", &self.world);
-        let _ = state.serialize_field("registry", &self.registry);
+        let _ = state.serialize_field("component_registry", &self.component_registry);
+        let _ = state.serialize_field("object_registry", &self.object_registry);
+
         state.end()
     }
 }
@@ -70,7 +85,10 @@ impl<'de> Deserialize<'de> for ESEngine {
         #[serde(field_identifier, rename_all = "lowercase")]
         enum Fields {
             World,
-            Registry,
+            #[serde(rename = "component_registry")]
+            ComponentRegistry,
+            #[serde(rename = "object_registry")]
+            ObjectRegistry,
         }
 
         struct V;
@@ -88,10 +106,17 @@ impl<'de> Deserialize<'de> for ESEngine {
                 let world = seq
                     .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let registry = seq
+                let component_registry = seq
                     .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(1, &self))?;
-                Ok(ESEngine::from_yaml(world, registry))
+                let object_registry = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(2, &self))?;
+                Ok(ESEngine::from_yaml(
+                    world,
+                    component_registry,
+                    object_registry,
+                ))
             }
 
             fn visit_map<V>(self, mut map: V) -> Result<ESEngine, V::Error>
@@ -99,7 +124,8 @@ impl<'de> Deserialize<'de> for ESEngine {
                 V: MapAccess<'de>,
             {
                 let mut world = None;
-                let mut registry = None;
+                let mut component_registry = None;
+                let mut object_registry = None;
                 while let Some(key) = map.next_key()? {
                     match key {
                         Fields::World => {
@@ -108,21 +134,34 @@ impl<'de> Deserialize<'de> for ESEngine {
                             }
                             world = Some(map.next_value()?);
                         }
-                        Fields::Registry => {
-                            if registry.is_some() {
-                                return Err(de::Error::duplicate_field("registry"));
+                        Fields::ComponentRegistry => {
+                            if component_registry.is_some() {
+                                return Err(de::Error::duplicate_field("component_registry"));
                             }
-                            registry = Some(map.next_value()?);
+                            component_registry = Some(map.next_value()?);
+                        }
+                        Fields::ObjectRegistry => {
+                            if object_registry.is_some() {
+                                return Err(de::Error::duplicate_field("object_registry"));
+                            }
+                            object_registry = Some(map.next_value()?);
                         }
                     }
                 }
                 let world = world.ok_or_else(|| de::Error::missing_field("world"))?;
-                let registry = registry.ok_or_else(|| de::Error::missing_field("registry"))?;
-                Ok(ESEngine::from_yaml(world, registry))
+                let component_registry = component_registry
+                    .ok_or_else(|| de::Error::missing_field("component_registry"))?;
+                let object_registry =
+                    object_registry.ok_or_else(|| de::Error::missing_field("object_registry"))?;
+                Ok(ESEngine::from_yaml(
+                    world,
+                    component_registry,
+                    object_registry,
+                ))
             }
         }
 
-        const FIELDS: &'static [&'static str] = &["world", "registry"];
+        const FIELDS: &'static [&'static str] = &["world", "component_registry", "object_registry"];
         deserializer.deserialize_struct("Engine", FIELDS, V)
     }
 }
