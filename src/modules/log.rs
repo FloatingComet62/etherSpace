@@ -108,15 +108,18 @@ macro_rules! log {
         ether_space::modules::log::Log::warn(&format!($($e),*));
     };
     (warn object $obj: expr) => {
-        crate::modules::log::Log::warn(
+        ether_space::modules::log::Log::warn(
             &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
         );
     };
     (err $($e: expr),*) => {
+        ether_space::modules::log::Log::critical_debug(file!(), line!(), &format!($($e),*));
+    };
+    (err crate $($e: expr),*) => {
         crate::modules::log::Log::critical_debug(file!(), line!(), &format!($($e),*));
     };
     (err object $obj: expr) => {
-        crate::modules::log::Log::critical_debug(
+        ether_space::modules::log::Log::critical_debug(
             &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
         );
     };
@@ -137,15 +140,18 @@ macro_rules! log {
         ether_space::modules::log::Log::warn(&format!($($e),*));
     };
     (warn object $obj: expr) => {
-        crate::modules::log::Log::warn(
+        ether_space::modules::log::Log::warn(
             &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
         );
     };
     (err $($e: expr),*) => {
-        crate::modules::log::Log::critical(file!(), line!(), &format!($($e),*));
+        ether_space::modules::log::Log::critical(&format!($($e),*));
+    };
+    (err crate $($e: expr),*) => {
+        crate::modules::log::Log::critical(&format!($($e),*));
     };
     (err object $obj: expr) => {
-        crate::modules::log::Log::critical(
+        ether_space::modules::log::Log::critical(
             &("\n".to_string() + &serde_yaml::to_string(&$obj).unwrap_or(format!("{:?}", $obj))),
         );
     };

@@ -24,11 +24,11 @@ fn trace_dependencies(
     let mut new_sort = vec![];
     for requirement in requirements.iter() {
         if trail.contains(requirement) {
-            log!(err "Don't eat your own tail");
+            log!(err crate "Don't eat your own tail");
         }
         let required_node =
             &root[convert_signature_to_index(root, requirement).unwrap_or_else(|| {
-                log!(err "Requirement {:?} are not fulfiled", requirement);
+                log!(err crate "Requirement {:?} are not fulfiled", requirement);
             })];
         if required_node.get_requirements().len() == 0 {
             if !new_sort.contains(&required_node.signature()) {
@@ -71,7 +71,7 @@ pub fn requirement_sort(vector: &mut Vec<&Component>) {
     for item in new_sort.iter() {
         new_vec.push(
             vector[convert_signature_to_index(vector, item).unwrap_or_else(|| {
-                log!(err "reached unreachable");
+                log!(err crate "reached unreachable");
             })],
         );
     }
@@ -135,7 +135,7 @@ impl Object {
             .get_component(component.signature(), registry)
             .is_some()
         {
-            log!(err
+            log!(err crate
                 "Cannot add the same component twice ({:?}) to object ({:})",
                 component.signature(),
                 self.id
