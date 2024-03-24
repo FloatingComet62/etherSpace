@@ -16,7 +16,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install SDL
+      run: apt-get install libsdl2-dev
     - name: Build
       run: cargo build --verbose
+    - name: Release Build
+      run: cargo build --verbose --release
     - name: Run tests
       run: cargo test --verbose
