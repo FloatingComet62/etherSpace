@@ -1,5 +1,4 @@
-use downcast_rs::{impl_downcast, Downcast};
-pub trait Renderer: Downcast {
+pub trait Renderer {
     /// Just draw a rectangle to the screen
     /// x -> abscissa of top left corner
     /// y -> ordinate of top left corner
@@ -13,7 +12,6 @@ pub trait Renderer: Downcast {
     /// radius -> radii of the circle
     fn draw_circle(&mut self, x: u32, y: u32, radius: u32);
 }
-impl_downcast!(Renderer);
 
 extern crate sdl2;
 use sdl2::{

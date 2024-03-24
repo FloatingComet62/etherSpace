@@ -1,9 +1,5 @@
 use ether_space::{
-    components::{Component, ComponentSignature},
-    engine::ESEngine,
-    log,
-    modules::vector::Vector2,
-    renderer::{Renderer, SDLRenderer},
+    components::{Component, ComponentSignature}, engine::ESEngine, events::Events, log, modules::vector::Vector2, renderer::{Renderer, SDLRenderer}
 };
 
 fn main() {
@@ -11,7 +7,7 @@ fn main() {
 
     let mut engine = ESEngine::load_file("data.txt").unwrap_or_else(|| {
         log!(warn "Failed to load from file");
-        let mut engine = ESEngine::new(None);
+        let mut engine = ESEngine::new();
         let obj1 = engine.object_registry.create_object();
         let translational = engine
             .component_registry
@@ -32,21 +28,16 @@ fn main() {
         );
         engine
     });
-    engine.renderer = Some(Box::new(SDLRenderer::new()));
+    let mut renderer = SDLRenderer::new();
 
     engine.start();
 
-    let renderer: &mut Box<dyn Renderer> = engine
-        .renderer
-        .as_mut()
-        .expect("Failed to access the renderer");
-    assert!(renderer.is::<SDLRenderer>());
-    let renderer: &mut SDLRenderer = renderer
-        .downcast_mut::<SDLRenderer>()
-        .expect("Failed to downcast the Renderer");
+    let mut events = Events(vec![]);
+
     loop {
         renderer.start_loop();
         engine.frame += 1;
+        engine.update(&mut events);
         engine.world.objects.clone().iter().for_each(|id| {
             let object = &engine.object_registry.0[*id];
             if let Some(Component::Transform(transform)) =
@@ -65,6 +56,6 @@ fn main() {
         }
     }
 
-    engine.to_file("data.txt");
+    // engine.to_file("data.txt");
     log!(info "Exiting");
 }

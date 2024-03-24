@@ -1,9 +1,8 @@
 use crate::{
     components::{Component, ComponentSignature},
+    events::Events,
     log,
-    registry::ComponentRegistry,
-    registry::ObjectRegistry,
-    renderer::Renderer,
+    registry::{ComponentRegistry, ObjectRegistry},
     world::World,
 };
 use core::fmt::Debug;
@@ -92,17 +91,15 @@ pub struct ESEngine {
     pub world: World,
     pub component_registry: ComponentRegistry,
     pub object_registry: ObjectRegistry,
-    pub renderer: Option<Box<dyn Renderer>>,
     pub frame: u32,
 }
 impl ESEngine {
-    pub fn new(renderer: Option<Box<dyn Renderer>>) -> Self {
+    pub fn new() -> Self {
         Self {
             world: World::new(0),
             component_registry: ComponentRegistry::new(),
             object_registry: ObjectRegistry::new(),
             frame: 0,
-            renderer,
         }
     }
     pub fn from_yaml(
@@ -115,7 +112,6 @@ impl ESEngine {
             component_registry,
             object_registry,
             frame: 0,
-            renderer: None,
         }
     }
     pub fn to_file(&self, file_name: &str) -> Option<()> {
@@ -139,7 +135,7 @@ impl ESEngine {
             binding
                 .iter()
                 .enumerate()
-                .for_each(|(i, binding_item)| object.components[i] = binding_item.get_id());
+                .for_each(|(i, binding_item)| object.components[i] = binding_item.id());
             // don't par_iter this in the future (keeping requirements in check)
             object.components.clone().iter().for_each(|id| {
                 let component = &mut self.component_registry.0[*id];
@@ -148,15 +144,17 @@ impl ESEngine {
             });
         });
     }
-    pub fn update(&mut self) {
+    pub fn update(&mut self, events: &mut Events) {
         self.world.objects.iter().for_each(|id| {
             let object = &mut self.object_registry.0[*id];
             log!(info crate "[{}] Updating of Object({})", self.frame, id);
             object.components.clone().iter().for_each(|id| {
                 let comp_reg_clone = self.component_registry.clone();
                 let component = &mut self.component_registry.0[*id];
-                log!(info crate "[{}] Updating of Component({}:{})", self.frame, id, component.signature());
-                component.update(object, &comp_reg_clone);
+                log!(info crate
+                    "[{}] Updating of Component({}:{})", self.frame, id, component.signature()
+                );
+                component.update(object, &comp_reg_clone, events);
             });
         });
     }

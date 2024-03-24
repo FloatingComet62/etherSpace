@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
-use crate::{objects::Object, registry::ComponentRegistry};
+use crate::{events::Events, objects::Object, registry::ComponentRegistry};
 
 pub mod transform;
 pub mod translational;
@@ -12,7 +12,7 @@ pub enum Component {
     Translational(translational::Translational),
 }
 impl Component {
-    pub fn get_id(&self) -> usize {
+    pub fn id(&self) -> usize {
         match self {
             Component::Transform(component) => component.id,
             Component::Translational(component) => component.id,
@@ -36,10 +36,10 @@ impl Component {
             Component::Translational(component) => component.start(object),
         }
     }
-    pub fn update(&mut self, object: &mut Object, component_registry: &ComponentRegistry) {
+    pub fn update(&mut self, object: &mut Object, component_registry: &ComponentRegistry, event: &mut Events) {
         match self {
-            Component::Transform(component) => component.update(object, component_registry),
-            Component::Translational(component) => component.update(object, component_registry),
+            Component::Transform(component) => component.update(object, component_registry, event),
+            Component::Translational(component) => component.update(object, component_registry, event),
         }
     }
 }
