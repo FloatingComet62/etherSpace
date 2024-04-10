@@ -1,5 +1,7 @@
 use crate::{
-    components::{transform::Transform, translational::Translational, render_config::RenderConfig, Component},
+    components::{
+        render_config::RenderConfig, transform::Transform, translational::Translational, Component,
+    },
     modules::vector::Vector2,
     objects::Object,
 };

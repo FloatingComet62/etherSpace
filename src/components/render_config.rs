@@ -1,9 +1,5 @@
 use super::ComponentSignature;
-use crate::{
-    events::Events,
-    objects::Object,
-    registry::ComponentRegistry,
-};
+use crate::{events::Events, objects::Object, registry::ComponentRegistry};
 use serde::{Deserialize, Serialize};
 
 /// # Render Config
@@ -40,7 +36,8 @@ impl RenderConfig {
         _object: &mut Object,
         _component_registry: &ComponentRegistry,
         _events: &mut Events,
-    ) {}
+    ) {
+    }
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -58,7 +55,7 @@ pub struct Circle {
 pub enum Shape {
     Rectangle(Rectangle),
     Circle(Circle),
-    None
+    None,
 }
 impl Default for Shape {
     fn default() -> Self {
