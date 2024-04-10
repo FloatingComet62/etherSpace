@@ -1,5 +1,5 @@
 use crate::{
-    components::{transform::Transform, translational::Translational, Component},
+    components::{transform::Transform, translational::Translational, render_config::RenderConfig, Component},
     modules::vector::Vector2,
     objects::Object,
 };
@@ -26,6 +26,23 @@ impl ComponentRegistry {
         let id = self.0.len();
         self.0
             .push(Component::Translational(Translational::new(id, velocity)));
+        id
+    }
+    #[inline]
+    pub fn create_renderconfig_rect(&mut self, width: u32, height: u32) -> usize {
+        let id = self.0.len();
+        self.0.push(Component::RenderConfig(RenderConfig::new_rect(
+            id, width, height,
+        )));
+        id
+    }
+    #[inline]
+    pub fn create_renderconfig_circle(&mut self, radius: u32) -> usize {
+        let id = self.0.len();
+        self.0
+            .push(Component::RenderConfig(RenderConfig::new_circle(
+                id, radius,
+            )));
         id
     }
 }

@@ -8,17 +8,29 @@ component_registry:
 - !Translational
   id: 0
   velocity:
-    x: 0.5
-    y: 0.5
+    x: 1.0
+    y: 1.0
+  requires: []
+- !RenderConfig
+  id: 1
+  shape: !Rectangle
+    width: 10
+    height: 10
   requires: []
 - !Transform
-  id: 1
+  id: 2
   position:
     x: 0.0
     y: 0.0
   requires: []
+- !RenderConfig
+  id: 3
+  shape: !Rectangle
+    width: 10
+    height: 10
+  requires: []
 - !Transform
-  id: 2
+  id: 4
   position:
     x: 0.0
     y: 0.0
@@ -28,6 +40,8 @@ object_registry:
   components:
   - 0
   - 1
+  - 2
 - id: 1
   components:
-  - 2
+  - 3
+  - 4

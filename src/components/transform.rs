@@ -1,5 +1,10 @@
 use super::ComponentSignature;
-use crate::{events::{Action, Events}, modules::vector::Vector2, objects::Object, registry::ComponentRegistry};
+use crate::{
+    events::{Action, Events},
+    modules::vector::Vector2,
+    objects::Object,
+    registry::ComponentRegistry,
+};
 use serde::{Deserialize, Serialize};
 
 /// # Transform
@@ -28,25 +33,27 @@ impl Transform {
         &mut self,
         _object: &mut Object,
         _component_registry: &ComponentRegistry,
-        events: &mut Events
+        events: &mut Events,
     ) {
         let mut to_remove = vec![];
-        events.receive_message_events(self.id).for_each(|message_event| {
-            macro_rules! action {
-                ($var: expr, $string: expr) => {
-                    if message_event.message == $string {
-                        match message_event.action {
-                            Action::INC => $var += message_event.value,
-                            Action::DEC => $var -= message_event.value,
-                            Action::SET => $var = message_event.value,
+        events
+            .receive_message_events(self.id)
+            .for_each(|message_event| {
+                macro_rules! action {
+                    ($var: expr, $string: expr) => {
+                        if message_event.message == $string {
+                            match message_event.action {
+                                Action::INC => $var += message_event.value,
+                                Action::DEC => $var -= message_event.value,
+                                Action::SET => $var = message_event.value,
+                            }
                         }
-                    }
+                    };
                 }
-            }
-            action!(self.position.x, "pos_x");
-            action!(self.position.y, "pos_y");
-            to_remove.push(message_event.id);
-        });
+                action!(self.position.x, "pos_x");
+                action!(self.position.y, "pos_y");
+                to_remove.push(message_event.id);
+            });
         events.remove(to_remove);
     }
 }

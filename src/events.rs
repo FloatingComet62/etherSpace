@@ -1,5 +1,5 @@
-use std::{iter::FilterMap, slice::Iter};
 use rand::Rng;
+use std::{iter::FilterMap, slice::Iter};
 
 #[derive(Clone, Debug)]
 pub enum Action {
@@ -15,7 +15,7 @@ pub struct MessageEvent {
     pub to: usize,
     pub action: Action,
     pub value: f64,
-    pub message: String
+    pub message: String,
 }
 
 #[derive(Debug)]
@@ -26,7 +26,7 @@ pub enum Event {
 impl Event {
     pub fn id(&self) -> usize {
         match self {
-            Event::Message(e) => e.id
+            Event::Message(e) => e.id,
         }
     }
 }
@@ -39,17 +39,17 @@ impl Events {
     }
     pub fn receive_message_events(
         &mut self,
-        receiver_id: usize
+        receiver_id: usize,
     ) -> FilterMap<Iter<'_, Event>, impl Fn(&Event) -> Option<MessageEvent>> {
-        let x = |receiver_id: usize| move |event: &Event| {
-                match event {
-                    Event::Message(y) => {
-                        if y.to == receiver_id {
-                            return Some(y.clone());
-                        }
-                        None
-                    },
+        let x = |receiver_id: usize| {
+            move |event: &Event| match event {
+                Event::Message(y) => {
+                    if y.to == receiver_id {
+                        return Some(y.clone());
+                    }
+                    None
                 }
+            }
         };
         self.0.iter().filter_map(x(receiver_id))
     }
@@ -59,7 +59,7 @@ impl Events {
         to: usize,
         action: Action,
         value: f64,
-        message: String
+        message: String,
     ) {
         self.0.push(Event::Message(MessageEvent {
             id: rand::thread_rng().gen(),
@@ -67,7 +67,7 @@ impl Events {
             to,
             action,
             value,
-            message
+            message,
         }));
     }
 }
