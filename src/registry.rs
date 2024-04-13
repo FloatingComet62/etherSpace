@@ -31,19 +31,24 @@ impl ComponentRegistry {
         id
     }
     #[inline]
-    pub fn create_renderconfig_rect(&mut self, width: u32, height: u32) -> usize {
+    pub fn create_renderconfig_rect(
+        &mut self,
+        width: u32,
+        height: u32,
+        color: (u8, u8, u8),
+    ) -> usize {
         let id = self.0.len();
         self.0.push(Component::RenderConfig(RenderConfig::new_rect(
-            id, width, height,
+            id, width, height, color,
         )));
         id
     }
     #[inline]
-    pub fn create_renderconfig_circle(&mut self, radius: u32) -> usize {
+    pub fn create_renderconfig_circle(&mut self, radius: u32, color: (u8, u8, u8)) -> usize {
         let id = self.0.len();
         self.0
             .push(Component::RenderConfig(RenderConfig::new_circle(
-                id, radius,
+                id, radius, color,
             )));
         id
     }

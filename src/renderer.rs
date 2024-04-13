@@ -4,13 +4,13 @@ pub trait Renderer {
     /// y -> ordinate of top left corner
     /// width -> width of rectangle
     /// height -> height of rectangle
-    fn draw_rectangle(&mut self, x: u32, y: u32, width: u32, height: u32);
+    fn draw_rectangle(&mut self, x: u32, y: u32, width: u32, height: u32, color: (u8, u8, u8));
 
     /// Just draw a circle to the screen
     /// x -> abscissa of center
     /// y -> ordinate of center
     /// radius -> radii of the circle
-    fn draw_circle(&mut self, x: u32, y: u32, radius: u32);
+    fn draw_circle(&mut self, x: u32, y: u32, radius: u32, color: (u8, u8, u8));
 }
 
 extern crate sdl2;
@@ -77,21 +77,24 @@ impl SDLRenderer {
     }
 }
 impl Renderer for SDLRenderer {
-    fn draw_circle(&mut self, x: u32, y: u32, radius: u32) {
-        self.canvas.set_draw_color(Color::RGB(255, 0, 0));
-        for i in x - radius..x + radius {
-            for j in y - radius..y + radius {
-                let delta = (x - i, y - j);
+    fn draw_circle(&mut self, x: u32, y: u32, radius: u32, color: (u8, u8, u8)) {
+        self.canvas
+            .set_draw_color(Color::RGB(color.0, color.1, color.2));
+        let radius = radius as i32;
+        for i in x as i32 - radius..x as i32 + radius {
+            for j in y as i32 - radius..y as i32 + radius {
+                let delta = (x as i32 - i as i32, y as i32 - j as i32);
                 if delta.0 * delta.0 + delta.1 * delta.1 <= radius * radius {
                     let _ = self
                         .canvas
-                        .draw_point(Point::new((x + delta.0) as i32, (y + delta.1) as i32));
+                        .draw_point(Point::new(x as i32 + delta.0, y as i32 + delta.1));
                 }
             }
         }
     }
-    fn draw_rectangle(&mut self, x: u32, y: u32, width: u32, height: u32) {
-        self.canvas.set_draw_color(Color::RGB(255, 0, 0));
+    fn draw_rectangle(&mut self, x: u32, y: u32, width: u32, height: u32, color: (u8, u8, u8)) {
+        self.canvas
+            .set_draw_color(Color::RGB(color.0, color.1, color.2));
         let rect = Rect::new(x as i32, y as i32, width, height);
         self.canvas
             .fill_rect(rect)

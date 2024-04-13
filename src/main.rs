@@ -21,7 +21,9 @@ fn main() {
                 .create_translational(Vector2::new(1.0, 1.0));
             engine.object_registry.add_component(obj1, translational);
 
-            let rect_renderconfig = engine.component_registry.create_renderconfig_rect(10, 10);
+            let rect_renderconfig = engine
+                .component_registry
+                .create_renderconfig_circle(10, (0, 255, 0));
             engine
                 .object_registry
                 .add_component(obj1, rect_renderconfig);
@@ -36,7 +38,10 @@ fn main() {
         {
             let obj2 = engine.object_registry.create_object();
 
-            let rect_renderconfig = engine.component_registry.create_renderconfig_rect(10, 10);
+            let rect_renderconfig =
+                engine
+                    .component_registry
+                    .create_renderconfig_rect(10, 10, (255, 0, 0));
             engine
                 .object_registry
                 .add_component(obj2, rect_renderconfig);
@@ -73,6 +78,7 @@ fn main() {
                                 transform.position.y as u32,
                                 shape.width,
                                 shape.height,
+                                render_config.color,
                             );
                         }
                         Shape::Circle(shape) => {
@@ -80,6 +86,7 @@ fn main() {
                                 transform.position.x as u32,
                                 transform.position.y as u32,
                                 shape.radius,
+                                render_config.color,
                             );
                         }
                         Shape::None => {}

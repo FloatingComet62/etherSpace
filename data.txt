@@ -13,9 +13,12 @@ component_registry:
   requires: []
 - !RenderConfig
   id: 1
-  shape: !Rectangle
-    width: 10
-    height: 10
+  shape: !Circle
+    radius: 10
+  color:
+  - 0
+  - 255
+  - 0
   requires: []
 - !Transform
   id: 2
@@ -28,6 +31,10 @@ component_registry:
   shape: !Rectangle
     width: 10
     height: 10
+  color:
+  - 255
+  - 0
+  - 0
   requires: []
 - !Transform
   id: 4

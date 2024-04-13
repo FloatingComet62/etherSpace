@@ -10,20 +10,23 @@ use serde::{Deserialize, Serialize};
 pub struct RenderConfig {
     pub id: usize,
     pub shape: Shape,
+    pub color: (u8, u8, u8),
     requires: Vec<ComponentSignature>,
 }
 impl RenderConfig {
-    pub fn new_rect(id: usize, width: u32, height: u32) -> Self {
+    pub fn new_rect(id: usize, width: u32, height: u32, color: (u8, u8, u8)) -> Self {
         Self {
             id,
             shape: Shape::Rectangle(Rectangle { width, height }),
+            color,
             requires: vec![],
         }
     }
-    pub fn new_circle(id: usize, radius: u32) -> Self {
+    pub fn new_circle(id: usize, radius: u32, color: (u8, u8, u8)) -> Self {
         Self {
             id,
             shape: Shape::Circle(Circle { radius }),
+            color,
             requires: vec![],
         }
     }
